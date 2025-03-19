@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { H1, Small, Subtle, Large } from "@/components/ui/typography"
 import Link from "next/link"
 import { motion } from "motion/react"
@@ -64,6 +65,27 @@ const LogIn = () => {
               </motion.div>
 
               <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className="space-y-2"
+              >
+                <label htmlFor="role" className="text-sm font-medium">
+                  <Small>Role</Small>
+                </label>
+                <Select>
+                  <SelectTrigger className="w-full transition-colors focus:border-blue-500">
+                    <SelectValue placeholder="Select your role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="teacher">Teacher</SelectItem>
+                    <SelectItem value="student">Student</SelectItem>
+                  </SelectContent>
+                </Select>
+              </motion.div>
+
+              <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -76,14 +98,14 @@ const LogIn = () => {
                 </Button>
               </motion.div>
 
-                <div className="flex flex-col sm:flex-row items-center justify-between text-sm space-y-2 sm:space-y-0">
+              <div className="flex flex-col sm:flex-row items-center justify-between text-sm space-y-2 sm:space-y-0">
                 <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
                   <Small>Don&#39;t have an account? Sign Up</Small>
                 </Link>
                 <Link href="/forgot-password" className="text-blue-600 hover:text-blue-700 font-medium">
                   <Small>Forgot password?</Small>
                 </Link>
-                </div>
+              </div>
             </form>
           </CardContent>
         </Card>
