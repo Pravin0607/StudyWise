@@ -1,15 +1,28 @@
 'use client';
 import useUserStore from "@/store/userStore"
 import { redirect } from "next/navigation";
-import { PropsWithChildren } from "react"
+import { PropsWithChildren, useEffect, useState } from "react"
 
-const PrivateSection = ({children}:PropsWithChildren) => {
-    const user=useUserStore(state=>state.user)
-    if(user.token){
-        return (
-            <div>{children}</div>
-        )
-    }else{
+const PrivateSection = ({children}: PropsWithChildren) => {
+    const user = useUserStore(state => state.user);
+    const [isLoading, setIsLoading] = useState(true);
+    
+    useEffect(() => {
+        // Just add a small delay to ensure hydration is complete
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 100);
+        
+        return () => clearTimeout(timer);
+    }, []);
+    
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+    
+    if (user.token) {
+        return <div>{children}</div>
+    } else {
         redirect('/login');
         return null;
     }

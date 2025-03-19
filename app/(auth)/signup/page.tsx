@@ -5,8 +5,42 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { H1, Small, Subtle, Large } from "@/components/ui/typography"
 import { motion } from "motion/react"
+import { useForm } from "react-hook-form"
+import axios from "axios"
+import { base_url } from "@/lib/constants"
+import { toast } from "react-hot-toast"
+import { useState } from "react"
+interface SignupFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  mobile: string;
+  dob: string;
+  password: string;
+  confirmPassword: string;
+}
 
 const SignIn = () => {
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<SignupFormData>();
+  const [role, setRole] = useState("")
+
+  const onSubmit = async (data: SignupFormData) => {
+    try {
+      console.log("Submitting Data : ",data)
+      const response = await axios.post(`${base_url}/auth/register`, {
+        ...data,
+        role
+      });
+  
+      if (response.status === 200) {
+        toast.success("Account created successfully!");
+        window.location.href = "/login";
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Something went wrong!");
+    }
+  };
+
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-50 p-4">
       <motion.div
@@ -22,7 +56,7 @@ const SignIn = () => {
             <Subtle>Enter your details to get started</Subtle>
           </CardHeader>
           <CardContent>
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <motion.div
                   initial={{ opacity: 0, x: -50 }}
@@ -34,14 +68,14 @@ const SignIn = () => {
                     <Small>First Name</Small>
                   </label>
                   <Input
-                    id="firstName"
-                    name="firstName"
+                    {...register("firstName", { required: "First name is required" })}
                     type="text"
                     placeholder="John"
-                    autoComplete="given-name"
-                    required
                     className="w-full transition-colors focus:border-blue-500"
                   />
+                  {errors.firstName && (
+                    <Small className="text-red-500">{errors.firstName.message}</Small>
+                  )}
                 </motion.div>
                 <motion.div
                   initial={{ opacity: 0, x: 50 }}
@@ -53,14 +87,14 @@ const SignIn = () => {
                     <Small>Last Name</Small>
                   </label>
                   <Input
-                    id="lastName"
-                    name="lastName"
+                    {...register("lastName", { required: "Last name is required" })}
                     type="text"
                     placeholder="Doe"
-                    autoComplete="family-name"
-                    required
                     className="w-full transition-colors focus:border-blue-500"
                   />
+                  {errors.lastName && (
+                    <Small className="text-red-500">{errors.lastName.message?.toString()}</Small>
+                  )}
                 </motion.div>
               </div>
 
@@ -74,14 +108,14 @@ const SignIn = () => {
                   <Small>Email</Small>
                 </label>
                 <Input
-                  id="email"
-                  name="email"
+                  {...register("email", { required: "Email is required" })}
                   type="email"
                   placeholder="you@example.com"
-                  autoComplete="email"
-                  required
                   className="w-full transition-colors focus:border-blue-500"
                 />
+                {errors.email && (
+                  <Small className="text-red-500">{errors.email.message?.toString()}</Small>
+                )}
               </motion.div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -95,14 +129,14 @@ const SignIn = () => {
                     <Small>Mobile No</Small>
                   </label>
                   <Input
-                    id="mobile"
-                    name="mobile"
+                    {...register("mobile", { required: "Mobile number is required" })}
                     type="tel"
                     placeholder="+91 9876543210"
-                    autoComplete="tel"
-                    required
                     className="w-full transition-colors focus:border-blue-500"
                   />
+                  {errors.mobile && (
+                    <Small className="text-red-500">{errors.mobile.message?.toString()}</Small>
+                  )}
                 </motion.div>
                 <motion.div
                   initial={{ opacity: 0, x: 50 }}
@@ -114,12 +148,13 @@ const SignIn = () => {
                     <Small>Date of Birth</Small>
                   </label>
                   <Input
-                    id="dob"
-                    name="dob"
+                    {...register("dob", { required: "Date of birth is required" })}
                     type="date"
-                    required
                     className="w-full transition-colors focus:border-blue-500"
                   />
+                  {errors.dob && (
+                    <Small className="text-red-500">{errors.dob.message?.toString()}</Small>
+                  )}
                 </motion.div>
               </div>
 
@@ -133,14 +168,14 @@ const SignIn = () => {
                   <Small>Password</Small>
                 </label>
                 <Input
-                  id="password"
-                  name="password"
+                  {...register("password", { required: "Password is required" })}
                   type="password"
                   placeholder="••••••••"
-                  autoComplete="new-password"
-                  required
                   className="w-full transition-colors focus:border-blue-500"
                 />
+                {errors.password && (
+                  <Small className="text-red-500">{errors.password.message?.toString()}</Small>
+                )}
               </motion.div>
 
               <motion.div
@@ -153,14 +188,17 @@ const SignIn = () => {
                   <Small>Confirm Password</Small>
                 </label>
                 <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
+                  {...register("confirmPassword", {
+                    required: "Confirm password is required",
+                    validate: (value) => value === watch("password") || "Passwords do not match"
+                  })}
                   type="password"
                   placeholder="••••••••"
-                  autoComplete="new-password"
-                  required
                   className="w-full transition-colors focus:border-blue-500"
                 />
+                {errors.confirmPassword && (
+                  <Small className="text-red-500">{errors.confirmPassword.message?.toString()}</Small>
+                )}
               </motion.div>
 
               <motion.div
@@ -172,7 +210,7 @@ const SignIn = () => {
                 <label htmlFor="role" className="text-sm font-medium">
                   <Small>Role</Small>
                 </label>
-                <Select>
+                <Select onValueChange={(value) => setRole(value)}>
                   <SelectTrigger className="w-full transition-colors focus:border-blue-500">
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>
