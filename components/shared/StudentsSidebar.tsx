@@ -1,20 +1,11 @@
-import { Calendar, Home, Inbox, LogOut, Search, Settings } from "lucide-react"
-import { useRouter } from "next/navigation"
+'use client';
+import { Calendar, Home, Inbox, LogOut, Search, Settings, BookOpen, GraduationCap, Library, User, UserCog } from "lucide-react"
+import { usePathname } from "next/navigation"
 import useUserStore from "@/store/userStore"
+import { useState, useCallback } from "react"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from "@/components/ui/sidebar"
-
-// Menu items.
+// Menu items with better matching icons
 const items = [
     {
         title: "Dashboard",
@@ -29,74 +20,100 @@ const items = [
     {
         title: "My Courses",
         url: "#",
-        icon: Calendar,
+        icon: BookOpen,
     },
     {
         title: "Enroll",
         url: "#",
-        icon: Search,
+        icon: GraduationCap,
     },
     {
         title: "Library",
         url: "#",
-        icon: Settings,
+        icon: Library,
     },
     {
         title: "Tutorials",
         url: "#",
-        icon: Settings,
+        icon: Calendar,
     },
     {
         title: "View Profile",
         url: "#",
-        icon: Settings,
+        icon: User,
     },
     {
         title: "Edit Profile",
         url: "#",
-        icon: Settings,
+        icon: UserCog,
     },
 ]
 
 const StudentsSidebar = () => {
-    const router = useRouter()
+    const pathname = usePathname()
     const { logout } = useUserStore()
+    const [isLoggingOut, setIsLoggingOut] = useState(false)
     
-    const handleLogout = () => {
-        logout()
-        router.push('/login')
-    }
+    const handleLogout = useCallback(() => {
+        if (isLoggingOut) return; // Prevent double-clicks        
+        setIsLoggingOut(true);        
+        // First perform logout
+        logout();        
+    }, [logout, isLoggingOut]);
 
     return (
-        <Sidebar>
-            <SidebarContent>
+        <Sidebar className="border-r border-border/40 bg-gradient-to-b from-background to-secondary/10 shadow-sm">
+            <div className="px-4 py-6">
+                <h2 className="text-xl font-bold tracking-tight text-primary mb-1">StudyWise</h2>
+                <p className="text-sm text-muted-foreground">Student Portal</p>
+            </div>
+            
+            <SidebarContent className="px-2">
                 <SidebarGroup>
-                    <SidebarGroupLabel className="text-sm">Student Portal</SidebarGroupLabel>
+                    <SidebarGroupLabel className="text-sm font-medium text-muted-foreground ml-3 mb-1">
+                        LEARNING CENTER
+                    </SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild>
-                                        <a href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </a>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
+                            {items.map((item) => {
+                                const isActive = pathname === item.url
+                                return (
+                                    <SidebarMenuItem key={item.title}>
+                                        <SidebarMenuButton
+                                            asChild
+                                            className={`transition-all duration-200 py-2.5 my-1 rounded-md font-medium text-[15px] ${
+                                                isActive 
+                                                ? "bg-primary/10 text-primary font-semibold" 
+                                                : "hover:bg-secondary/80 hover:text-foreground"
+                                            }`}
+                                        >
+                                            <a href={item.url} className="flex items-center">
+                                                <item.icon size={22} className={`mr-3 ${isActive ? "text-primary" : ""}`} />
+                                                <span>{item.title}</span>
+                                            </a>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                )
+                            })}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter className="flex flex-col gap-3">
+            
+            <SidebarFooter className="mt-auto border-t border-border/30 p-4">
                 <button 
                     onClick={handleLogout}
-                    className="flex items-center gap-2 hover:text-red-500 transition-colors w-full p-2 rounded-md"
+                    disabled={isLoggingOut}
+                    className={`flex items-center w-full p-3 text-[15px] font-medium rounded-md 
+                        ${isLoggingOut 
+                            ? "bg-gray-300 text-gray-500" 
+                            : "bg-rose-500/10 hover:bg-rose-500/20 text-rose-600"} 
+                        transition-all duration-200`}
                 >
-                    <LogOut size={18} />
-                    <span>Logout</span>
+                    <LogOut size={20} className="mr-3" />
+                    <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
                 </button>
-                <p>&copy; 2023 StudyWise</p>
+                <p className="text-xs text-muted-foreground text-center mt-4">&copy; 2025 StudyWise</p>
             </SidebarFooter>
         </Sidebar>
     )
