@@ -13,6 +13,7 @@ import { toast } from "react-hot-toast"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import useUserStore from "@/store/userStore"
+import { useAuthRedirect } from "@/hooks/useAuthRedirect"
 
 interface LoginFormData {
   email: string;
@@ -20,6 +21,9 @@ interface LoginFormData {
 }
 
 const LogIn = () => {
+  // Check if user is already logged in
+  useAuthRedirect();
+  
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
   const [role, setRole] = useState("")
   const router = useRouter()

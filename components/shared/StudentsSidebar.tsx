@@ -1,4 +1,6 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Calendar, Home, Inbox, LogOut, Search, Settings } from "lucide-react"
+import { useRouter } from "next/navigation"
+import useUserStore from "@/store/userStore"
 
 import {
     Sidebar,
@@ -57,6 +59,14 @@ const items = [
 ]
 
 const StudentsSidebar = () => {
+    const router = useRouter()
+    const { logout } = useUserStore()
+    
+    const handleLogout = () => {
+        logout()
+        router.push('/login')
+    }
+
     return (
         <Sidebar>
             <SidebarContent>
@@ -78,7 +88,14 @@ const StudentsSidebar = () => {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter>
+            <SidebarFooter className="flex flex-col gap-3">
+                <button 
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 hover:text-red-500 transition-colors w-full p-2 rounded-md"
+                >
+                    <LogOut size={18} />
+                    <span>Logout</span>
+                </button>
                 <p>&copy; 2023 StudyWise</p>
             </SidebarFooter>
         </Sidebar>

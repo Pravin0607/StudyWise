@@ -1,4 +1,4 @@
-import { Book, Calendar, UserPen, FileText, Home, LineChart, LogOut, Settings, Users } from "lucide-react"
+import { BarChart2, BookOpen, DollarSign, Home, LifeBuoy, LogOut, Settings, Shield, Users } from "lucide-react"
 import { useRouter } from "next/navigation"
 import useUserStore from "@/store/userStore"
 
@@ -18,47 +18,47 @@ import {
 const items = [
     {
         title: "Dashboard",
-        url: "/teacher/dashboard",
+        url: "/admin/dashboard",
         icon: Home,
     },
     {
-        title: "My Classes",
-        url: "#",
-        icon: UserPen,
-    },
-    {
-        title: "Create Course",
-        url: "#",
-        icon: Book,
-    },
-    {
-        title: "Assignments",
-        url: "#",
-        icon: FileText,
-    },
-    {
-        title: "Students",
+        title: "User Management",
         url: "#",
         icon: Users,
     },
     {
-        title: "Calendar",
+        title: "Courses",
         url: "#",
-        icon: Calendar,
+        icon: BookOpen,
     },
     {
         title: "Analytics",
         url: "#",
-        icon: LineChart,
+        icon: BarChart2,
     },
     {
-        title: "Settings",
+        title: "System Settings",
         url: "#",
         icon: Settings,
     },
+    {
+        title: "Security",
+        url: "#",
+        icon: Shield,
+    },
+    {
+        title: "Billing",
+        url: "#",
+        icon: DollarSign,
+    },
+    {
+        title: "Support",
+        url: "#",
+        icon: LifeBuoy,
+    },
 ]
 
-const TeachersSidebar = () => {
+const AdminSidebar = () => {
     const router = useRouter()
     const { logout } = useUserStore()
     
@@ -71,7 +71,7 @@ const TeachersSidebar = () => {
         <Sidebar>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel className="text-sm">Teacher Portal</SidebarGroupLabel>
+                    <SidebarGroupLabel className="text-sm">Admin Portal</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => (
@@ -102,4 +102,4 @@ const TeachersSidebar = () => {
     )
 }
 
-export default TeachersSidebar
+export default AdminSidebar

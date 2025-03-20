@@ -10,6 +10,7 @@ import axios from "axios"
 import { base_url } from "@/lib/constants"
 import { toast } from "react-hot-toast"
 import { useState } from "react"
+import { useAuthRedirect } from "@/hooks/useAuthRedirect"
 interface SignupFormData {
   firstName: string;
   lastName: string;
@@ -21,6 +22,9 @@ interface SignupFormData {
 }
 
 const SignIn = () => {
+  // Check if user is already logged in
+  useAuthRedirect();
+  
   const { register, handleSubmit, formState: { errors }, watch } = useForm<SignupFormData>();
   const [role, setRole] = useState("")
 
