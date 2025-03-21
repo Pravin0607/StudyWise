@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import MaterialsTable from "./MaterialsTable";
 
 interface Material {
     id: string;
@@ -133,30 +134,7 @@ const MaterialsPage = () => {
             {/* File List Section */}
             <div>
                 <h2 className="text-xl font-semibold mb-2">Uploaded Files</h2>
-                {materials.length === 0 ? (
-                    <p>No files uploaded yet.</p>
-                ) : (
-                    <ul className="list-disc pl-5">
-                        {materials.map((material) => (
-                            <li key={material.id} className="mb-2">
-                                <a
-                                    href={material.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-500 hover:underline"
-                                >
-                                    {material.filename}
-                                </a>
-                                <button
-                                    onClick={() => handleDelete(material.id)}
-                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2"
-                                >
-                                    Delete
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                <MaterialsTable/>               
             </div>
         </div>
     );
