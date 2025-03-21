@@ -35,27 +35,27 @@ const items = [
     },
     {
         title: "Students",
-        url: "#",
+        url: "/teacher/students",
         icon: Users,
     },
     {
         title: "Calendar",
-        url: "#",
+        url: "/teacher/calendar",
         icon: Calendar,
     },
-    {
-        title: "Assignments",
-        url: "#",
-        icon: FileText,
-    },
-    {
-        title: "Analytics",
-        url: "#",
-        icon: LineChart,
-    },
+    // {
+    //     title: "Assignments",
+    //     url: "#",
+    //     icon: FileText,
+    // },
+    // {
+    //     title: "Analytics",
+    //     url: "#",
+    //     icon: LineChart,
+    // },
     {
         title: "Settings",
-        url: "#",
+        url: "/teacher/settings",
         icon: Settings,
     },
 ]
@@ -77,7 +77,7 @@ const TeachersSidebar = () => {
             <SidebarContent className="px-2">
                 <SidebarGroup>
                     <SidebarGroupLabel className="text-sm font-medium text-muted-foreground ml-3 mb-1">
-                        INSTRUCTOR TOOLS
+                        Teachers TOOLS
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
