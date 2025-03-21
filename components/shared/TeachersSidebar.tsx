@@ -14,6 +14,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Link from "next/link";
 
 // Menu items.
 const items = [
@@ -24,12 +25,12 @@ const items = [
     },
     {
         title: "My Classes",
-        url: "#",
+        url: "/teacher/classes/",
         icon: UserPen,
     },
     {
-        title: "Create Course",
-        url: "#",
+        title: "My Materials",
+        url: "/teacher/materials",
         icon: Book,
     },
     {
@@ -68,7 +69,7 @@ const TeachersSidebar = () => {
     }
     
     return (
-        <Sidebar className="border-r border-border/40 bg-gradient-to-b from-background to-secondary/10 shadow-sm">
+        <Sidebar variant="inset" className="border-r border-border/40 bg-gradient-to-b from-background to-secondary/10 shadow-sm">
             <div className="px-4 py-6">
                 <h2 className="text-xl font-bold tracking-tight text-primary mb-1">StudyWise</h2>
                 <p className="text-sm text-muted-foreground">Teacher Portal</p>
@@ -93,10 +94,10 @@ const TeachersSidebar = () => {
                                                 : "hover:bg-secondary/80 hover:text-foreground"
                                             }`}
                                         >
-                                            <a href={item.url} className="flex items-center">
+                                            <Link href={item.url} className="flex items-center">
                                                 <item.icon size={22} className={`mr-3 ${isActive ? "text-primary" : ""}`} />
                                                 <span>{item.title}</span>
-                                            </a>
+                                            </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 )

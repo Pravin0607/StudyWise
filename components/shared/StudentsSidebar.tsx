@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation"
 import useUserStore from "@/store/userStore"
 import { useState, useCallback } from "react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
+import Link from "next/link";
 
 // Menu items with better matching icons
 const items = [
@@ -87,10 +88,10 @@ const StudentsSidebar = () => {
                                                 : "hover:bg-secondary/80 hover:text-foreground"
                                             }`}
                                         >
-                                            <a href={item.url} className="flex items-center">
+                                            <Link href={item.url} className="flex items-center">
                                                 <item.icon size={22} className={`mr-3 ${isActive ? "text-primary" : ""}`} />
                                                 <span>{item.title}</span>
-                                            </a>
+                                            </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 )

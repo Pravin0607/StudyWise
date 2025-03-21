@@ -14,6 +14,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Link from "next/link";
 
 // Menu items.
 const items = [
@@ -92,10 +93,10 @@ const AdminSidebar = () => {
                                                 : "hover:bg-secondary/80 hover:text-foreground"
                                             }`}
                                         >
-                                            <a href={item.url} className="flex items-center">
+                                            <Link href={item.url} className="flex items-center">
                                                 <item.icon size={22} className={`mr-3 ${pathname === item.url ? "text-primary" : ""}`} />
                                                 <span>{item.title}</span>
-                                            </a>
+                                            </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 )
