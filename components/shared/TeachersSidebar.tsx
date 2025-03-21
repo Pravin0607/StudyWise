@@ -63,7 +63,6 @@ const items = [
 const TeachersSidebar = () => {
     const pathname = usePathname()
     const { logout } = useUserStore()
-    console.log(pathname)
     const handleLogout = () => {
         logout()
     }
@@ -84,7 +83,6 @@ const TeachersSidebar = () => {
                         <SidebarMenu>
                             {items.map((item) => {
                                 const isActive = pathname === item.url
-                                console.log(`pathname: ${pathname} item.url: ${item.url} isActive: ${isActive}`)
                                 return (
                                     <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton
@@ -97,7 +95,7 @@ const TeachersSidebar = () => {
                                         >
                                             <Link href={item.url} className="flex items-center">
                                                 <item.icon size={22} className={`mr-3 ${isActive ? "text-primary" : ""}`} />
-                                                <span>{item.title} {isActive ?"True":"False"}</span>
+                                                <span>{item.title}</span>
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>

@@ -102,7 +102,7 @@ const MaterialsPage = () => {
                 <select
                     value={selectedClass}
                     onChange={handleClassChange}
-                    className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-3"
+                    className="shadow appearance-none border rounded w-full md:w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-3"
                 >
                     <option value="">Select Class</option>
                     {classes.map((className) => (
@@ -117,8 +117,6 @@ const MaterialsPage = () => {
                     onChange={handleFileChange}
                     className="mb-2"
                 />
-
-
                 <button
                     onClick={handleUpload}
                     disabled={
