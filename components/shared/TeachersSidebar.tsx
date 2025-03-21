@@ -1,5 +1,5 @@
 'use client';
-import { Book, Calendar, UserPen, FileText, Home, LineChart, LogOut, Settings, Users } from "lucide-react"
+import { Book, Calendar, UserPen, FileText, Home, FileTextIcon, LogOut, Settings, Users } from "lucide-react"
 import { usePathname } from "next/navigation"
 import useUserStore from "@/store/userStore"
 
@@ -32,6 +32,11 @@ const items = [
         title: "My Materials",
         url: "/teacher/materials",
         icon: Book,
+    },
+    {
+        title:"Exams",
+        url:"/teacher/examcenter",
+        icon: FileTextIcon,
     },
     {
         title: "Students",
