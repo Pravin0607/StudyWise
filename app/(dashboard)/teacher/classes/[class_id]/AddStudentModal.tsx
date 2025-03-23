@@ -92,13 +92,13 @@ const AddStudentModal = ({
                     )}
                 </div>
                 {selectedStudent && (
-                    <DialogFooter className='flex items-center justify-between'>
+                    <DialogFooter className='flex items-center justify-between md:flex-col'>
 
-                        <p className="text-sm text-gray-700 order-1 mb-2">
+                        <p className="text-sm text-gray-700 order-1  mb-2">
                             Confirm selection of <span className="font-bold">{selectedStudent.name}</span>?
                         </p>
 
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 md:order-1">
                             <Button variant="outline" onClick={() => setSelectedStudent(null)}>
                                 Cancel
                             </Button>
