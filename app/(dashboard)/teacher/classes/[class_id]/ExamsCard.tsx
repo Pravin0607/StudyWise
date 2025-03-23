@@ -5,6 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { cn } from "@/lib/utils";
 import { File, PlusIcon } from 'lucide-react';
+import ExamCreationOptionModal from './ExamCreationOptionModal';
 
 interface Exam {
     id: number;
@@ -36,9 +37,11 @@ export function ExamsCard({
             <CardHeader>
                 <div className='flex justify-between items-center'>
                     <CardTitle className={cn("text-lg", textColor)}>Exams</CardTitle>
+                    <ExamCreationOptionModal>
                     <Button size={'sm'} variant="outline" className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 border-purple-500/30 font-bold md:h-9 md:px-4 md:py-2 md:text-sm">
                         Create Exam <PlusIcon strokeWidth={3.5}/>
                     </Button>
+                    </ExamCreationOptionModal>
                 </div>
                 <Separator className={separatorColor} />
             </CardHeader>
