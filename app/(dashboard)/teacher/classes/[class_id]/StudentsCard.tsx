@@ -5,6 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { cn } from "@/lib/utils";
 import { PlusIcon, User } from 'lucide-react';
+import AddStudentModal from './AddStudentModal';
 
 interface Student {
     id: string;
@@ -35,9 +36,11 @@ export function StudentsCard({
             <CardHeader>
                 <div className='flex justify-between items-center'>
                     <CardTitle className={cn("text-lg", textColor)}>Students</CardTitle>
+                    <AddStudentModal>
                     <Button size={'sm'} variant="outline" className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 border-blue-500/30 flex items-center font-bold md:h-9 md:px-4 md:py-2 md:text-sm">
                         Add Student <PlusIcon strokeWidth={3.5}/>
                     </Button>
+                    </AddStudentModal>
                 </div>
                 <Separator className={separatorColor} />
             </CardHeader>
