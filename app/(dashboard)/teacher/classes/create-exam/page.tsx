@@ -1,9 +1,19 @@
-import React from 'react'
+'use client';
 
-const CreateExamManually = () => {
+import { useState } from "react"
+import ExamMetaDataStep from "./ExamMetaDataStep";
+import ExamQuestionsStep from "./ExamQuestionsStep";
+
+const CreateExamManualy = () => {
+    const [formStep,setFormStep]=useState(1);
   return (
-    <div className='flex-1 p-2'>CreateExamManually</div>
+    <div className="p-3 flex-1 h-full">
+        {formStep===0 && <ExamMetaDataStep nextStep={()=>{setFormStep(prev=>prev+1)}}/>}
+        {
+            formStep===1 && <ExamQuestionsStep/>
+        }
+    </div>
   )
 }
 
-export default CreateExamManually
+export default CreateExamManualy
