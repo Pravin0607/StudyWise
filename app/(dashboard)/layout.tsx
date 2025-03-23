@@ -27,8 +27,9 @@ const Layout = ({children}:{children:ReactNode}) => {
               </div>
             </div>
             </div>
-
+            <div className='h-[95%] overflow-y-none'>
             {children}
+            </div>
           </main>
         </SidebarInset>
     </SidebarProvider>
