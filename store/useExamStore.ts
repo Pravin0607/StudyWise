@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
+import { devtools,persist, createJSONStorage } from "zustand/middleware";
 
 interface Question {
     type: "mcq" | "descriptive";
@@ -38,7 +38,9 @@ interface ExamState {
 }
 
 export const useExamStore = create<ExamState>()(
-    devtools((set) => ({
+    devtools(
+        persist(
+        (set) => ({
         title: "",
         classId: "",
         date: "",
@@ -65,5 +67,10 @@ export const useExamStore = create<ExamState>()(
               newQuestions[index] = updatedQuestion;
               return { questions: newQuestions };
             }),
-    }))
+    }),    {
+        name: 'user-storage', // unique name for localStorage key
+        storage: createJSONStorage(() => localStorage),
+        // You can specify which parts of the state to persist
+        partialize: (state) => ({ ...state }),
+      }))
 );
