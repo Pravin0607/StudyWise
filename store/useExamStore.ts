@@ -72,7 +72,14 @@ export const useExamStore = create<ExamState>()(
         storage: createJSONStorage(() => localStorage),
         // You can specify which parts of the state to persist
         partialize: (state) => {
-            return ({ ExamCreation:{...state} })
+            return ({ title:state.title,
+            classId:state.classId,
+            date:state.date,
+            startTime:state.startTime,
+            endTime:state.endTime,
+            totalMarks:state.totalMarks,
+            questions:state.questions           
+             })
         },
       }))
 );
