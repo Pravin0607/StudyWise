@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
+import { devtools,persist, createJSONStorage } from "zustand/middleware";
 
 interface Question {
     type: "mcq" | "descriptive";
@@ -15,7 +15,7 @@ type ExamMetaData = {
     date: string;
     startTime: string;
     endTime: string;
-    marks: number;
+    totalMarks: number;
 };
 
 interface ExamState {
@@ -24,7 +24,7 @@ interface ExamState {
     date: string;
     startTime: string;
     endTime: string;
-    marks: number;
+    totalMarks: number;
     questions: Question[];
     setTitle: (title: string) => void;
     setClass: (classId: string) => void;
@@ -38,17 +38,19 @@ interface ExamState {
 }
 
 export const useExamStore = create<ExamState>()(
-    devtools((set) => ({
+    devtools(
+        persist(
+        (set) => ({
         title: "",
         classId: "",
         date: "",
         startTime: "",
         endTime: "",
-        marks: 0,
+        totalMarks: 0,
         questions: [],
         setTitle: (title) => set({ title }),
         setClass: (classId) => set({ classId }),
-        setMarks: (marks) => set({ marks }),
+        setMarks: (marks) => {let totalMarks=marks;set({ totalMarks })},
         setDateTime: (date, startTime, endTime) =>
             set({ date, startTime, endTime }),
         addQuestion: (question) =>
@@ -65,5 +67,12 @@ export const useExamStore = create<ExamState>()(
               newQuestions[index] = updatedQuestion;
               return { questions: newQuestions };
             }),
-    }))
+    }),    {
+        name: 'Exam', // unique name for localStorage key
+        storage: createJSONStorage(() => localStorage),
+        // You can specify which parts of the state to persist
+        partialize: (state) => {
+            return ({ ExamCreation:{...state} })
+        },
+      }))
 );
