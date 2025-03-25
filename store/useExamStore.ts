@@ -34,6 +34,7 @@ interface ExamState {
     removeQuestion: (index: number) => void;
     resetForm: () => void;
     setExamMetaData: (data: ExamMetaData) => void;
+    updateQuestion: (index: number, updatedQuestion: Question) => void;
 }
 
 export const useExamStore = create<ExamState>()(
@@ -58,5 +59,11 @@ export const useExamStore = create<ExamState>()(
             })),
         resetForm: () => set({ title: "", classId: "", questions: [] }),
         setExamMetaData: (data) => set({ ...data }),
+        updateQuestion: (index: number, updatedQuestion: Question) =>
+            set((state) => {
+              const newQuestions = [...state.questions];
+              newQuestions[index] = updatedQuestion;
+              return { questions: newQuestions };
+            }),
     }))
 );
