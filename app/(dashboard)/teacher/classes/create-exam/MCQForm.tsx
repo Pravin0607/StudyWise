@@ -210,7 +210,7 @@ const MCQForm = () => {
       </div>
 
       {/* Submit Button */}
-      <Button type="submit" className="w-full">
+      <Button type="submit" className="w-full bg-green-500 hover:bg-green-600">
         Create Question
       </Button>
     </form>

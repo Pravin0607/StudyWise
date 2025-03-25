@@ -15,7 +15,7 @@ type ExamMetaData = {
     date: string;
     startTime: string;
     endTime: string;
-    marks: number;
+    totalMarks: number;
 };
 
 interface ExamState {
@@ -24,7 +24,7 @@ interface ExamState {
     date: string;
     startTime: string;
     endTime: string;
-    marks: number;
+    totalMarks: number;
     questions: Question[];
     setTitle: (title: string) => void;
     setClass: (classId: string) => void;
@@ -46,11 +46,11 @@ export const useExamStore = create<ExamState>()(
         date: "",
         startTime: "",
         endTime: "",
-        marks: 0,
+        totalMarks: 0,
         questions: [],
         setTitle: (title) => set({ title }),
         setClass: (classId) => set({ classId }),
-        setMarks: (marks) => set({ marks }),
+        setMarks: (marks) => {let totalMarks=marks;set({ totalMarks })},
         setDateTime: (date, startTime, endTime) =>
             set({ date, startTime, endTime }),
         addQuestion: (question) =>
@@ -68,9 +68,11 @@ export const useExamStore = create<ExamState>()(
               return { questions: newQuestions };
             }),
     }),    {
-        name: 'user-storage', // unique name for localStorage key
+        name: 'Exam', // unique name for localStorage key
         storage: createJSONStorage(() => localStorage),
         // You can specify which parts of the state to persist
-        partialize: (state) => ({ ...state }),
+        partialize: (state) => {
+            return ({ ExamCreation:{...state} })
+        },
       }))
 );

@@ -23,6 +23,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useExamStore } from "@/store/useExamStore";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 const examMetadataSchema = z.object({
     title: z.string().min(1, { message: "Title is required" }),
@@ -43,7 +44,7 @@ const examMetadataSchema = z.object({
         ),
     startTime: z.string().min(1, { message: "Start time is required" }),
     endTime: z.string().min(1, { message: "End time is required" }),
-    marks: z.coerce
+    totalMarks: z.coerce
         .number()
         .min(0, { message: "Marks must be a non-negative number" })
         .refine((data) => !isNaN(data), {
@@ -57,7 +58,7 @@ const examMetadataSchema = z.object({
 type TExamMetaData = z.infer<typeof examMetadataSchema>;
 
 const ExamMetaDataStep = ({ nextStep }: { nextStep: () => void }) => {
-    const { setExamMetaData } = useExamStore();
+    const { setExamMetaData, title, classId, date, startTime, endTime, totalMarks } = useExamStore();
     const {
         register,
         setValue,
@@ -65,19 +66,34 @@ const ExamMetaDataStep = ({ nextStep }: { nextStep: () => void }) => {
         watch,
         formState: { errors },
         setError,
+        reset
     } = useForm<TExamMetaData>({
         defaultValues: {
-            marks: 0,
+            title: "",
             classId: "",
+            date: "",
+            startTime: "",
+            endTime: "",
+            totalMarks: 0,
         },
         resolver: zodResolver(examMetadataSchema),
     });
+    useEffect(() => {
+        // Check if we have any persisted data and populate the form
+        if (title) setValue("title", title);
+        if (classId) setValue("classId", classId);
+        if (date) setValue("date", date);
+        if (startTime) setValue("startTime", startTime);
+        if (endTime) setValue("endTime", endTime);
+        if (totalMarks) setValue("totalMarks", totalMarks);
+    }, [title, classId, date, startTime, endTime, totalMarks, setValue]);
+    
     const onSubmit: SubmitHandler<TExamMetaData> = (data) => {
-        if (String(watch("marks")) !== "") {
+        if (String(watch("totalMarks")) !== "") {
             setExamMetaData(data);
             nextStep();
         } else {
-            setError("marks", {
+            setError("totalMarks", {
                 message: "Marks cant't be Empty.",
             });
         }
@@ -159,10 +175,10 @@ const ExamMetaDataStep = ({ nextStep }: { nextStep: () => void }) => {
                         </div>
                         <div>
                             <Label>Total Marks </Label>
-                            <Input type="number" {...register("marks")} />
-                            {errors.marks && (
+                            <Input type="number" {...register("totalMarks")} />
+                            {errors.totalMarks && (
                                 <span className="text-sm text-red-500">
-                                    {errors.marks?.message}
+                                    {errors.totalMarks?.message}
                                 </span>
                             )}
                         </div>
