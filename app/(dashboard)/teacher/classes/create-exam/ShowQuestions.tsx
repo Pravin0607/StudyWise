@@ -2,11 +2,18 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useExamStore } from "@/store/useExamStore";
 import { Edit, Trash2, Star } from "lucide-react";
+import { useState } from "react";
+import EditQuestionModal from "./EditQuestionModal";
 
 const ShowQuestions = () => {
   const Questions = useExamStore(state => state.questions);
   const removeQuestion = useExamStore(state => state.removeQuestion);
-  
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+const [editingQuestionIndex, setEditingQuestionIndex] = useState(-1);
+const handleEditQuestion = (index: number) => {
+  setEditingQuestionIndex(index);
+  setIsEditModalOpen(true);
+};
   return (
     <div className="p-4 sm:p-6 bg-slate-50 rounded-xl shadow-lg w-full max-w-2xl mx-auto border border-slate-200">
       <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center">
@@ -54,7 +61,7 @@ const ShowQuestions = () => {
                         variant="ghost"
                         size="sm"
                         className="h-8 w-8 p-0 rounded-full hover:bg-blue-50"
-                        // onClick={() => handleEditQuestion(index)}
+                        onClick={() => handleEditQuestion(index)}
                       >
                         <Edit className="h-4 w-4 text-blue-600" />
                       </Button>
@@ -105,6 +112,11 @@ const ShowQuestions = () => {
           )}
         </div>
       </ScrollArea>
+      <EditQuestionModal
+  isOpen={isEditModalOpen}
+  onClose={() => setIsEditModalOpen(false)}
+  questionIndex={editingQuestionIndex}
+/>
     </div>
   );
 };
