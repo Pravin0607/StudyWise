@@ -123,16 +123,16 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">
+          <DialogTitle className="text-lg sm:text-xl font-bold">
             Edit {isMCQ ? 'Multiple Choice' : 'Descriptive'} Question
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
           {/* Question Text */}
-          <div className="space-y-2">
+          <div className="space-y-1 sm:space-y-2">
             <label htmlFor="question" className="text-sm font-medium block">
               Question Text
             </label>
@@ -143,13 +143,13 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
                 <Textarea
                   id="question"
                   placeholder="Enter your question here..."
-                  className="w-full"
+                  className="w-full min-h-[80px] sm:min-h-[100px]"
                   {...field}
                 />
               )}
             />
             {errors.question && (
-              <p className="text-sm text-red-500">{String(errors?.question?.message)}</p>
+              <p className="text-xs sm:text-sm text-red-500">{String(errors?.question?.message)}</p>
             )}
           </div>
 
@@ -254,11 +254,11 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
             )}
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0 mt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <DialogFooter className="gap-2 sm:gap-0 mt-4 flex-col sm:flex-row">
+            <Button type="button" variant="outline" onClick={onClose} className="w-full sm:w-auto order-2 sm:order-1">
               Cancel
             </Button>
-            <Button type="submit">
+            <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">
               Save Changes
             </Button>
           </DialogFooter>
