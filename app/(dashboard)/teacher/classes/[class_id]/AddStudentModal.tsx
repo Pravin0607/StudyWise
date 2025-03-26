@@ -3,11 +3,32 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import axios from 'axios';
+import { Endpoints } from '@/lib/apiEndpoints';
+import useUserStore from '@/store/userStore';
+import useClassStore from '@/store/useClassStore';
 
 interface Student {
-    id: string;
-    name: string;
+    user_id: string;
+    first_name: string;
+    last_name: string;
     email: string;
+}
+const fetchStudentByQuery = async (query: string,token:string) => {
+    try {
+        const result = await axios.get(Endpoints.CLASS.GETSTUDENTSBYSEARCH, {
+            params: {
+                search: query
+            },
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return result.data?.students;
+    } catch (e) {
+        console.log(e);
+        return [];
+    }
 }
 
 const AddStudentModal = ({
@@ -21,41 +42,37 @@ const AddStudentModal = ({
 }) => {
     const [open, setOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [availableStudents, setAvailableStudents] = useState<Student[]>(initialStudents || [
-        { id: '1', name: 'Alice Smith', email: 'alice.smith@example.com' },
-        { id: '2', name: 'Bob Johnson', email: 'bob.johnson@example.com' },
-        { id: '3', name: 'Charlie Brown', email: 'charlie.brown@example.com' },
-        { id: '4', name: 'Diana Miller', email: 'diana.miller@example.com' },
-        { id: '5', name: 'Ethan Davis', email: 'ethan.davis@example.com' },
-        { id: '6', name: 'Fiona Wilson', email: 'fiona.wilson@example.com' },
-        { id: '7', name: 'George Martinez', email: 'george.martinez@example.com' },
-        { id: '8', name: 'Hannah Anderson', email: 'hannah.anderson@example.com' },
-        { id: '9', name: 'Isaac Taylor', email: 'isaac.taylor@example.com' },
-        { id: '10', name: 'Jessica Thomas', email: 'jessica.thomas@example.com' },
-    ]);
+    const [availableStudents, setAvailableStudents] = useState<Student[]>(initialStudents || []);
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+    const token=useUserStore(state=>state.user?.token);
+    const studentDetails=useClassStore(state=>state.studentsDetails);
 
     const handleStudentSelect = useCallback((student: Student) => {
         setSelectedStudent(student); // Set the selected student
     }, []);
 
-    const confirmSelection = () => {
-        if (selectedStudent && onStudentSelect) {
+    const confirmSelection = async() => {
+        if (selectedStudent && onStudentSelect) {            
             onStudentSelect(selectedStudent);
         }
+        setSelectedStudent(null); // Reset the selected student
         setOpen(false); // Close the modal after confirmation
     };
 
-    const filteredStudents = availableStudents.filter(student =>
-        student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.email.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
     useEffect(() => {
-        if (initialStudents) {
-            setAvailableStudents(initialStudents);
-        }
-    }, [initialStudents]);
+        const fetchData = async () => {
+            let students = await fetchStudentByQuery(searchQuery,token as string);
+            // filter out students that are already in the class
+            if(studentDetails)
+                {
+                students = students.filter((student:any) => !studentDetails.find(s => s.user_id === student.user_id));
+            setAvailableStudents(students);
+        };
+    };
+
+        fetchData();
+    }, [searchQuery]);
+
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -72,16 +89,16 @@ const AddStudentModal = ({
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    {filteredStudents.length > 0 ? (
+                    {availableStudents.length > 0 ? (
                         <ScrollArea className='h-72'>
                             <div className="space-y-2">
-                                {filteredStudents.map(student => (
+                                {availableStudents.map(student => (
                                     <div
-                                        key={student.id}
+                                        key={student.user_id}
                                         className="p-2 rounded-md cursor-pointer hover:bg-gray-100"
                                         onClick={() => handleStudentSelect(student)}
                                     >
-                                        <p className="font-bold">{student.name}</p>
+                                        <p className="font-bold">{student.first_name} {student.last_name}</p>
                                         <p className="font-semibold text-gray-500">{student.email}</p>
                                     </div>
                                 ))}
@@ -95,7 +112,7 @@ const AddStudentModal = ({
                     <DialogFooter className='flex items-center justify-between md:flex-col'>
 
                         <p className="text-sm text-gray-700 order-1  mb-2">
-                            Confirm selection of <span className="font-bold">{selectedStudent.name}</span>?
+                            Confirm selection of <span className="font-bold">{selectedStudent.first_name} {selectedStudent.last_name}</span>?
                         </p>
 
                         <div className="flex gap-2 md:order-1">

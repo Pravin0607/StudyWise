@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { cn } from "@/lib/utils";
 import { useTheme } from 'next-themes';
 import { StudentsCard } from './StudentsCard';
@@ -7,6 +7,7 @@ import { MaterialsCard } from './MaterialsCard';
 import { ExamsCard } from './ExamsCard';
 import { ArrowLeft, CircleArrowLeft } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
+import useClassStore from '@/store/useClassStore';
 
 // Keep your sample data here
 interface Student {
@@ -55,6 +56,13 @@ const ClassDashboard = () => {
     const { theme } = useTheme();
     const router=useRouter();
     const {class_id}=useParams();
+    const class_details=useClassStore(state=>state.selectedClass);
+    const fetchStudents=useClassStore(state=>state.fetchStudentsByClassId);
+    const studentDetails=useClassStore(state=>state.studentsDetails);
+
+    useEffect(()=>{
+        fetchStudents(class_id as string);
+    },[])
     const themeStyles = {
         textColor: theme === 'dark' ? 'text-gray-200' : 'text-gray-800',
         cardBgColor: theme === 'dark' ? 'bg-gray-800' : 'bg-white',
@@ -76,13 +84,15 @@ const ClassDashboard = () => {
                 <span className="hidden sm:inline">Back</span>
             </button>
             <h1 className={cn("text-xl font-bold flex-1 text-center", themeStyles.textColor)}>
-                Class {class_id}
+                Class : <strong>
+                    {class_details?.class_name}
+                    </strong>
             </h1>
         </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <StudentsCard
-                    students={sampleStudents}
+                    students={studentDetails ?? []}
                     {...themeStyles}
                 />
                 <MaterialsCard 

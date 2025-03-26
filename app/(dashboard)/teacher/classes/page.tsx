@@ -1,4 +1,5 @@
 "use client";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -13,20 +14,27 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
 import toast from "react-hot-toast";
-const classes = [{ name: "Class 1" }, { name: "Class 2" }, { name: "Class 3" }];
+import useUserStore from "@/store/userStore";
+import { Endpoints } from "@/lib/apiEndpoints";
+import { useEffect, useState } from "react";
+import useClasses from "@/hooks/utility/useClasses";
+import useClassStore from "@/store/useClassStore";
 type ClassForm = {
     name: string;
 };
+
 const Classes = () => {
+    const { classList } = useClasses();
+    const {selectClass}=useClassStore();
     return (
         <div>
             <CreateClassDialog />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full h-full">
-                {classes.map((classItem, index) => (
-                    <Link href={`/teacher/classes/${index}`} key={index}>
-                        <Card className="p-0 h-32 cursor-pointer">
+                {classList.map((classItem) => (
+                    <Link href={`/teacher/classes/${classItem.class_id}`} key={classItem.class_id}>
+                        <Card className="p-0 h-32 cursor-pointer" onClick={()=>{selectClass(classItem.class_id)}}>
                             <CardContent className="p-2 flex h-full flex-col items-center justify-center">
-                                <h1>{classItem.name}</h1>
+                                <h1>{classItem.class_name}</h1>
                             </CardContent>
                         </Card>
                     </Link>
@@ -48,13 +56,27 @@ const CreateClassDialog = () => {
             name: "",
         },
     });
-    const onSubmit: SubmitHandler<ClassForm> = (data) => {
-        console.log(data);
-        toast.success("Class Created");
-        reset();
+    const {user:{token}}=useUserStore();
+    const [open, setOpen] = useState(false);
+    const onSubmit: SubmitHandler<ClassForm> = async(data) => {
+        // make a post request to create class
+        try{
+            const result=await axios.post(Endpoints.CLASS.CREATECLASS,{class_name:data.name},{headers:{Authorization:`Bearer ${token}`}});
+            if(result.status!==201){
+                toast.error("An error occured");
+            }
+            const {class_id,class_name}=result.data?.ClassResp;
+            console.log(class_id,class_name);
+            toast.success("Class Created");
+            reset();
+            setOpen(false);
+        }catch(err){
+            console.error(err);
+            toast.error("An error occured");
+        }
     };
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button className="my-2">
                     <Plus /> Create Class
