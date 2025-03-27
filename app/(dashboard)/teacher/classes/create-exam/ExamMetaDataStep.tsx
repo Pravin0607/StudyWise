@@ -24,6 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useExamStore } from "@/store/useExamStore";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
+import useClasses from "@/hooks/utility/useClasses";
 
 const examMetadataSchema = z.object({
     title: z.string().min(1, { message: "Title is required" }),
@@ -59,6 +60,7 @@ type TExamMetaData = z.infer<typeof examMetadataSchema>;
 
 const ExamMetaDataStep = ({ nextStep }: { nextStep: () => void }) => {
     const { setExamMetaData, title, classId, date, startTime, endTime, totalMarks } = useExamStore();
+    const {classList}=useClasses();
     const {
         register,
         setValue,
@@ -126,17 +128,16 @@ const ExamMetaDataStep = ({ nextStep }: { nextStep: () => void }) => {
                                 value={watch("classId")}
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select a class" />
+                                    <SelectValue  placeholder="Select a Class" className="text-black"/>
                                 </SelectTrigger>
-                                <SelectContent
-                                    className={
-                                        "bg-background w-[280px] md:w-[470px] max-h-60"
-                                    }
-                                >
+                                <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem value="classId_1">
-                                            class 1
-                                        </SelectItem>
+                                        {
+                                            classList.map((classItem)=>(<SelectItem key={classItem.class_id} value={classItem.class_id} className="hover:bg-primary-100 cursor-pointer">
+                                                {classItem.class_name}
+                                            </SelectItem>))
+                                        }
+                                        
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
