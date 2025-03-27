@@ -40,7 +40,7 @@ const ExamCreationForm = ({prevStep}:{prevStep:()=>void}) => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="mcq">Multiple Choice</SelectItem>
-            <SelectItem value="descriptive">Descriptive</SelectItem>
+            {/* <SelectItem value="descriptive">Descriptive</SelectItem> */}
           </SelectContent>
         </Select>
       </div>
