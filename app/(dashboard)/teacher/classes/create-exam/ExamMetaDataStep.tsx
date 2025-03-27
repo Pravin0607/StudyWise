@@ -25,6 +25,12 @@ import { useExamStore } from "@/store/useExamStore";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import useClasses from "@/hooks/utility/useClasses";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { TimePicker } from "@/components/shared/TimePicker";
 
 const examMetadataSchema = z.object({
     title: z.string().min(1, { message: "Title is required" }),
@@ -128,16 +134,22 @@ const ExamMetaDataStep = ({ nextStep }: { nextStep: () => void }) => {
                                 value={watch("classId")}
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue  placeholder="Select a Class" className="text-black"/>
+                                    <SelectValue
+                                        placeholder="Select a Class"
+                                        className="text-black"
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        {
-                                            classList.map((classItem)=>(<SelectItem key={classItem.class_id} value={classItem.class_id} className="hover:bg-primary-100 cursor-pointer">
+                                        {classList.map((classItem) => (
+                                            <SelectItem
+                                                key={classItem.class_id}
+                                                value={classItem.class_id}
+                                                className="hover:bg-primary-100 cursor-pointer"
+                                            >
                                                 {classItem.class_name}
-                                            </SelectItem>))
-                                        }
-                                        
+                                            </SelectItem>
+                                        ))}
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
@@ -149,7 +161,64 @@ const ExamMetaDataStep = ({ nextStep }: { nextStep: () => void }) => {
                         </div>
                         <div>
                             <Label>Date </Label>
-                            <Input type="date" {...register("date")} />
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "group bg-background hover:bg-background border-input w-full justify-between px-3 h-10 font-normal outline-offset-0 outline-none focus-visible:outline-[3px]",
+                                            !watch("date") &&
+                                                "text-muted-foreground"
+                                        )}
+                                    >
+                                        <span
+                                            className={cn(
+                                                "truncate",
+                                                !watch("date") &&
+                                                    "text-muted-foreground"
+                                            )}
+                                        >
+                                            {watch("date")
+                                                ? format(
+                                                      new Date(watch("date")),
+                                                      "PPP"
+                                                  )
+                                                : "Pick a date"}
+                                        </span>
+                                        <CalendarIcon
+                                            size={16}
+                                            className="text-muted-foreground/80 group-hover:text-foreground shrink-0 transition-colors"
+                                            aria-hidden="true"
+                                        />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                    className="w-auto p-2"
+                                    align="start"
+                                >
+                                    <Calendar
+                                        mode="single"
+                                        selected={
+                                            watch("date")
+                                                ? new Date(watch("date"))
+                                                : undefined
+                                        }
+                                        onSelect={(date) => {
+                                            if (date) {
+                                                setValue(
+                                                    "date",
+                                                    format(date, "yyyy-MM-dd")
+                                                );
+                                            }
+                                        }}
+                                        disabled={(date) => {
+                                            const today = new Date();
+                                            today.setHours(0, 0, 0, 0);
+                                            return date < today;
+                                        }}
+                                    />
+                                </PopoverContent>
+                            </Popover>
                             {errors.date && (
                                 <span className="text-sm text-red-500">
                                     {errors.date?.message}
@@ -157,22 +226,20 @@ const ExamMetaDataStep = ({ nextStep }: { nextStep: () => void }) => {
                             )}
                         </div>
                         <div>
-                            <Label>Start Time </Label>
-                            <Input type="time" {...register("startTime")} />
-                            {errors.startTime && (
-                                <span className="text-sm text-red-500">
-                                    {errors.startTime?.message}
-                                </span>
-                            )}
+                            <Label>Start Time</Label>
+                            <TimePicker
+                                value={watch("startTime")}
+                                onChange={(time) => setValue("startTime", time)}
+                                error={errors.startTime?.message}
+                            />
                         </div>
                         <div>
-                            <Label>End Time </Label>
-                            <Input type="time" {...register("endTime")} />
-                            {errors.endTime && (
-                                <span className="text-sm text-red-500">
-                                    {errors.endTime?.message}
-                                </span>
-                            )}
+                            <Label>End Time</Label>
+                            <TimePicker
+                                value={watch("endTime")}
+                                onChange={(time) => setValue("endTime", time)}
+                                error={errors.endTime?.message}
+                            />
                         </div>
                         <div>
                             <Label>Total Marks </Label>

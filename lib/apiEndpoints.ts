@@ -21,5 +21,7 @@ export const Endpoints={
         GETSTUDENTSBYCLASSID:`${base_url}/teacher/get-students/:classId`,
         // GET ?search
         GETSTUDENTSBYSEARCH:`${base_url}/teacher/get-students`,
+        // POST
+        CREATEEXAM:`${base_url}/teacher/create-exam`,
     }    
 }

@@ -11,6 +11,7 @@ export type ClassType = {
   students: string[];
   teacher_id: string;
   subjects?: any[];
+  exams?:string[]
 };
 
 type ClassState = {

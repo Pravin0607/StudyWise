@@ -6,6 +6,8 @@ import { useState } from "react";
 import EditQuestionModal from "./EditQuestionModal";
 import axios from "axios";
 import toast from "react-hot-toast";
+import useUserStore from "@/store/userStore";
+import { Endpoints } from "@/lib/apiEndpoints";
 
 const ShowQuestions = () => {
   const Questions = useExamStore((state) => state.questions);
@@ -18,6 +20,7 @@ const ShowQuestions = () => {
     endTime,
     totalMarks,
   } = useExamStore();
+  const token=useUserStore(state=>state.user.token);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingQuestionIndex, setEditingQuestionIndex] = useState(-1);
@@ -41,12 +44,36 @@ const ShowQuestions = () => {
     try {
       // Show a loading toast
       toast.loading("Creating exam...");
-      console.log("payload", payload);
-      const response = await axios.post("/api/exams", payload);
+      const response = await axios.post(Endpoints.CLASS.CREATEEXAM, payload,{
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      });
+      /*
+      response returns :data:{
+    "message": "Exam created successfully",
+    "exam": {
+        "exam_id": "15e80113-20da-419e-a485-0006fda55d5e",
+        "title": "Tets 1",
+        "class_id": "0195d05a-f874-7000-8647-3bc35ae14163",
+        "date": "2025-03-27T00:00:00.000Z",
+        "start_time": "16:00",
+        "end_time": "17:00",
+        "total_marks": 30,
+        "questions_count": 2
+    },
+    "success": true
+}
+      */
       // Handle success
-      toast.dismiss(); // Dismiss the loading toast
-      toast.success("Exam created successfully!");
-      console.log("Exam created:", response.data);
+      if(response.status===201)
+      {
+        toast.dismiss(); // Dismiss the loading toast
+        toast.success("Exam created successfully!");
+      }else{
+        toast.dismiss(); 
+        toast.error(response.data.message || "Failed to create the exam.");
+      }
     } catch (error) {
       // Handle errors
       toast.dismiss(); // Dismiss the loading toast
