@@ -59,7 +59,17 @@ export const useExamStore = create<ExamState>()(
             set((state) => ({
                 questions: state.questions.filter((_, i) => i !== index),
             })),
-        resetForm: () => set({ title: "", classId: "", questions: [] }),
+        resetForm: () => set(
+            {
+                title: "",
+                classId: "",
+                date: "",
+                startTime: "",
+                endTime: "",
+                totalMarks: 0,
+                questions: [],
+            }
+        ),
         setExamMetaData: (data) => set({ ...data }),
         updateQuestion: (index: number, updatedQuestion: Question) =>
             set((state) => {
