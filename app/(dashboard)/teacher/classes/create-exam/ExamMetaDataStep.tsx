@@ -31,6 +31,7 @@ import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { TimePicker } from "@/components/shared/TimePicker";
+import useClassStore from "@/store/useClassStore";
 
 const examMetadataSchema = z.object({
     title: z.string().min(1, { message: "Title is required" }),
@@ -67,6 +68,8 @@ type TExamMetaData = z.infer<typeof examMetadataSchema>;
 const ExamMetaDataStep = ({ nextStep }: { nextStep: () => void }) => {
     const { setExamMetaData, title, classId, date, startTime, endTime, totalMarks } = useExamStore();
     const {classList}=useClasses();
+    const selectedClass=useClassStore(state=>state.selectedClass);
+
     const {
         register,
         setValue,
@@ -89,7 +92,7 @@ const ExamMetaDataStep = ({ nextStep }: { nextStep: () => void }) => {
     useEffect(() => {
         // Check if we have any persisted data and populate the form
         if (title) setValue("title", title);
-        if (classId) setValue("classId", classId);
+        if (classId) setValue("classId", selectedClass?.class_id ?? classId);
         if (date) setValue("date", date);
         if (startTime) setValue("startTime", startTime);
         if (endTime) setValue("endTime", endTime);
