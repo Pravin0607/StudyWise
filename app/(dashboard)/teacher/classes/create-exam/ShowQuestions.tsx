@@ -8,10 +8,13 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import useUserStore from "@/store/userStore";
 import { Endpoints } from "@/lib/apiEndpoints";
+import { useRouter } from "next/navigation";
 
 const ShowQuestions = () => {
   const Questions = useExamStore((state) => state.questions);
   const removeQuestion = useExamStore((state) => state.removeQuestion);
+  const resetForm=useExamStore(state=>state.resetForm);
+  const router=useRouter();
   const {
     title,
     classId,
@@ -70,6 +73,8 @@ const ShowQuestions = () => {
       {
         toast.dismiss(); // Dismiss the loading toast
         toast.success("Exam created successfully!");
+        resetForm();
+        router.push('/teacher/classes');
       }else{
         toast.dismiss(); 
         toast.error(response.data.message || "Failed to create the exam.");
