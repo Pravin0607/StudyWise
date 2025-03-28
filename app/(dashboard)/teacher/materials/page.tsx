@@ -31,6 +31,9 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Download, Trash2, FileUp, FileText } from "lucide-react";
+import { useMaterialStore } from "@/store/useMaterialStore";
+import useUserStore from "@/store/userStore";
+import { deleteMaterial, downloadMaterial, getMaterialsByTeacher } from "@/services/materialsServices";
 
 interface Material {
     material_id: string;
@@ -47,28 +50,46 @@ const MaterialsPage = () => {
         pageIndex: 0,
         pageSize: 9,
     });
+    const token = useUserStore((state) => state.user.token);
 
     useEffect(() => {
         fetchMaterials();
     }, []);
 
     const fetchMaterials = async () => {
-        const mockData: Material[] = [
-            {
-                material_id: "a724bd8a-6c61-4cd3-bf8d-0eaedbb0fc49",
-                file_name: "shyam_Santosh_Adhav_Resume.pdf",
-                uploaded_date: "2025-03-28T11:28:19.593Z",
-                class_name: "MCA",
-            },
-            {
-                material_id: "a724bd8a-6c6-4cd3-bf8d-0eaedbb0fc49",
-                file_name: "zravin_Santosh_Adhav_Resume.pdf",
-                uploaded_date: "2025-03-28T11:28:19.593Z",
-                class_name: "MCA",
-            },
-        ];
+        // const mockData: Material[] = [
+        //     {
+        //         material_id: "a724bd8a-6c61-4cd3-bf8d-0eaedbb0fc49",
+        //         file_name: "shyam_Santosh_Adhav_Resume.pdf",
+        //         uploaded_date: "2025-03-28T11:28:19.593Z",
+        //         class_name: "MCA",
+        //     },
+        //     {
+        //         material_id: "a724bd8a-6c6-4cd3-bf8d-0eaedbb0fc49",
+        //         file_name: "zravin_Santosh_Adhav_Resume.pdf",
+        //         uploaded_date: "2025-03-28T11:28:19.593Z",
+        //         class_name: "MCA",
+        //     },
+        // ];
         // setMaterials(mockData);
-        setMaterials([]);
+        const materials:any=await getMaterialsByTeacher(token as string);
+        if (materials) {
+            setMaterials(materials);
+        } else {
+            setMaterials([]);
+        }
+        // setMaterials(materials);
+    };
+    
+    const handleDownload = async (materialId: string) => {
+        try {
+            const downloadUrl = await downloadMaterial(materialId, token as string);
+            if (downloadUrl) {
+                window.open(downloadUrl, '_blank');
+            }
+        } catch (error) {
+            console.error('Failed to download material:', error);
+        }
     };
 
     const columns: ColumnDef<Material>[] = useMemo(
@@ -100,12 +121,7 @@ const MaterialsPage = () => {
                         <Button
                             variant="secondary"
                             size="icon"
-                            onClick={() =>
-                                window.open(
-                                    `/api/download?filename=${row.original.file_name}`,
-                                    "_blank"
-                                )
-                            }
+                            onClick={() => handleDownload(row.original.material_id)}
                         >
                             <Download className="h-4 w-4" />
                         </Button>
@@ -129,8 +145,9 @@ const MaterialsPage = () => {
                                 <AlertDialogFooter>
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                     <AlertDialogAction
-                                        onClick={() => {
-                                            alert("delete");
+                                        onClick={async() => {
+                                            await deleteMaterial(row.original.material_id, token as string);
+                                            window.location.reload();
                                         }}
                                     >
                                         Continue

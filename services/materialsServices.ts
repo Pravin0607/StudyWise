@@ -13,6 +13,7 @@ export interface Material {
     file_size: number;
     s3_link: string;
     uploaded_date?: Date;
+    class_name?: string;
 }
 
 // Function to upload material
