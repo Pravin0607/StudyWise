@@ -39,16 +39,11 @@ const items = [
         icon: Calendar,
     },
     {
-        title: "View Profile",
+        title: "Settings",
         url: "#",
-        icon: User,
+        icon: Settings,
     },
-    {
-        title: "Edit Profile",
-        url: "#",
-        icon: UserCog,
-    },
-]
+];
 
 const StudentsSidebar = () => {
     const pathname = usePathname()
