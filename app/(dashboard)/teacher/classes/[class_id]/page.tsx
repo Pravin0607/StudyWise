@@ -8,6 +8,9 @@ import { ExamsCard } from './ExamsCard';
 import { ArrowLeft, CircleArrowLeft } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import useClassStore from '@/store/useClassStore';
+import { getMaterialsByClassId } from '@/services/materialsServices';
+import useUserStore from '@/store/userStore';
+import { useMaterialStore } from '@/store/useMaterialStore';
 
 // Keep your sample data here
 interface Student {
@@ -15,37 +18,7 @@ interface Student {
     name: string;
 }
 
-interface Material {
-    id: string;
-    title: string;
-    type: string; // e.g., "Lecture", "Assignment", "Quiz"
-}
 
-const sampleStudents: Student[] = [
-    { id: '1', name: 'Alice Smith' },
-    { id: '2', name: 'Bob Johnson' },
-    { id: '3', name: 'Charlie Brown' },
-    { id: '4', name: 'Diana Miller' },
-    { id: '5', name: 'Ethan Davis' },
-    { id: '6', name: 'Fiona Wilson' },
-    { id: '7', name: 'George Martinez' },
-    { id: '8', name: 'Hannah Anderson' },
-    { id: '9', name: 'Isaac Taylor' },
-    { id: '10', name: 'Jessica Thomas' },
-];
-
-const sampleMaterials: Material[] = [
-    { id: '1', title: 'Introduction to React', type: 'Lecture' },
-    { id: '2', title: 'Props and State', type: 'Lecture' },
-    { id: '3', title: 'Component Lifecycle', type: 'Assignment' },
-    { id: '4', title: 'Hooks Explained', type: 'Lecture' },
-    { id: '5', title: 'Midterm Exam', type: 'Quiz' },
-    { id: '6', title: 'Redux Basics', type: 'Lecture' },
-    { id: '7', title: 'React Router', type: 'Lecture' },
-    { id: '8', title: 'Final Project Guidelines', type: 'Assignment' },
-    { id: '9', title: 'Advanced State Management', type: 'Lecture' },
-    { id: '10', title: 'Performance Optimization', type: 'Lecture' },
-];
 
 const sampleExams=[
     {id:1,title:"chapter 1 Exam",type:'MCQ'},
@@ -59,10 +32,16 @@ const ClassDashboard = () => {
     const class_details=useClassStore(state=>state.selectedClass);
     const fetchStudents=useClassStore(state=>state.fetchStudentsByClassId);
     const studentDetails=useClassStore(state=>state.studentsDetails);
-
+    const token=useUserStore(state=>state.user.token);
+    const {classMaterials,setClassMaterials,fetchMaterialsByClassId}=useMaterialStore();
     useEffect(()=>{
         fetchStudents(class_id as string);
+        (async ()=>{
+           const data:any=await getMaterialsByClassId(class_id as string,token as string);
+           fetchMaterialsByClassId(class_id as string,token as string);
+        })()
     },[])
+    
     const themeStyles = {
         textColor: theme === 'dark' ? 'text-gray-200' : 'text-gray-800',
         cardBgColor: theme === 'dark' ? 'bg-gray-800' : 'bg-white',
@@ -96,7 +75,7 @@ const ClassDashboard = () => {
                     {...themeStyles}
                 />
                 <MaterialsCard 
-                    materials={sampleMaterials}
+                    materials={classMaterials}
                     {...themeStyles}
                 />
                 <ExamsCard

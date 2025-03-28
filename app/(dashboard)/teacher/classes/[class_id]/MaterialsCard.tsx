@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { cn } from "@/lib/utils";
-import { File, PlusIcon, Trash } from 'lucide-react';
+import { File, PlusIcon, Trash, Download } from 'lucide-react';
 import AddMaterialModal from './AddMaterialModal';
 import {
     AlertDialog,
@@ -17,12 +17,11 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import useClassStore from '@/store/useClassStore';
+import useUserStore from '@/store/userStore';
+import {  downloadMaterial, Material } from '@/services/materialsServices';
+import { useMaterialStore } from '@/store/useMaterialStore';
 
-interface Material {
-    id: string;
-    title: string;
-    type: string;
-}
 
 interface MaterialsCardProps {
     materials: Material[];
@@ -43,9 +42,31 @@ export function MaterialsCard({
     itemBgColor,
     itemBorderColor
 }: MaterialsCardProps) {
-    const handleDeleteMaterial = async (materialId: string) => {
+    const selectedClass=useClassStore(state=>state.selectedClass);
+    const token=useUserStore(state=>state.user.token);
+    const { deleteMaterialById } = useMaterialStore();
+     const handleDeleteMaterial = async (materialId: string) => {
         // Implement delete logic here
-        console.log(`Deleting material with ID: ${materialId}`);
+        try {
+            const success = await deleteMaterialById(materialId, token as string);
+            if (!success){
+                console.error('Failed to delete material');
+            }
+            window.location.reload();
+        } catch (error) {
+            console.error('Failed to delete material:', error);
+        }
+    };
+
+    const handleDownload = async (materialId: string) => {
+        try {
+            const downloadUrl = await downloadMaterial(materialId, token as string);
+            if (downloadUrl) {
+                window.open(downloadUrl, '_blank');
+            }
+        } catch (error) {
+            console.error('Failed to download material:', error);
+        }
     };
 
     return (
@@ -53,7 +74,7 @@ export function MaterialsCard({
             <CardHeader>
                 <div className='flex justify-between items-center'>
                     <CardTitle className={cn("text-lg", textColor)}>Materials</CardTitle>
-                    <AddMaterialModal>
+                    <AddMaterialModal  classId={selectedClass?.class_id as string} >
                     <Button size={'sm'} variant="outline" className="text-green-400 hover:text-green-300 hover:bg-green-500/20 border-green-500/30 flex items-center font-bold h-8 px-2 py-1 text-xs md:h-9 md:px-4 md:py-2 md:text-sm">
                         <span className="hidden sm:inline">Add Material</span>
                         <span className="sm:hidden">Add</span>
@@ -69,7 +90,7 @@ export function MaterialsCard({
                         {materials.length > 0 ? (
                             materials.map((material) => (
                                 <div
-                                    key={material.id}
+                                    key={material._id}
                                     className={cn(
                                         "p-3 rounded-md",
                                         itemBgColor,
@@ -80,29 +101,39 @@ export function MaterialsCard({
                                     )}
                                 >
                                     <div className='flex gap-x-3 items-center cursor-pointer'>
-                                        <File/> <span>{material.title}</span>
+                                        <File/> <span>{material.file_name.length > 50  ? material.file_name.substring(0, 26) + '...' + material.file_name.substring(material.file_name.lastIndexOf('.')) : material.file_name}</span>
                                     </div>
-                                    <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                            <Button variant="destructive" size="icon" className="h-8 w-8">
-                                                <Trash className="h-4 w-4" />
-                                            </Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                                <AlertDialogTitle>Delete Material</AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                    Are you sure you want to delete <span className="font-bold">{material.title}</span>? This action cannot be undone.
-                                                </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction onClick={() => handleDeleteMaterial(material.id)}>
-                                                    Delete
-                                                </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
+                                    <div className="flex items-center space-x-2">
+                                        <Button 
+                                            variant="outline" 
+                                            size="icon" 
+                                            className="h-8 w-8 text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 border-blue-500/30"
+                                            onClick={() => handleDownload(material.material_id)}
+                                        >
+                                            <Download className="h-4 w-4" />
+                                        </Button>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button variant="destructive" size="icon" className="h-8 w-8">
+                                                    <Trash className="h-4 w-4" />
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Delete Material</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        Are you sure you want to delete <span className="font-bold">{material.file_name}</span>? This action cannot be undone.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => handleDeleteMaterial(material.material_id)}>
+                                                        Delete
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </div>
                                 </div>
                             ))
                         ) : (

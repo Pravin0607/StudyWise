@@ -1,163 +1,279 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import toast from "react-hot-toast";
+import React, { useState, useEffect, useMemo } from "react";
+import {
+    ColumnDef,
+    flexRender,
+    getCoreRowModel,
+    getPaginationRowModel,
+    useReactTable,
+    getSortedRowModel,
+    getFilteredRowModel,
+} from "@tanstack/react-table";
+import { Input } from "@/components/ui/input";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Download, Trash2, FileUp, FileText } from "lucide-react";
 
 interface Material {
-    id: string;
-    filename: string;
-    url: string;
-    type: string;
+    material_id: string;
+    file_name: string;
+    uploaded_date: string;
+    class_name: string;
 }
 
 const MaterialsPage = () => {
     const [materials, setMaterials] = useState<Material[]>([]);
-    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-    const [uploading, setUploading] = useState(false);
-    const [classes, setClasses] = useState<string[]>([
-        "Class A",
-        "Class B",
-        "Class C",
-    ]); // Example classes
-    const [selectedClass, setSelectedClass] = useState<string>("");
+    const [sorting, setSorting] = useState<any>([]);
+    const [globalFilter, setGlobalFilter] = useState("");
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 9,
+    });
 
     useEffect(() => {
         fetchMaterials();
     }, []);
 
     const fetchMaterials = async () => {
-        try {
-            //  const response = await axios.get('/api/materials');
-            setMaterials([]);
-        } catch (error) {
-            console.error("Error fetching materials:", error);
-            toast.error("Failed to load materials.");
-        }
+        const mockData: Material[] = [
+            {
+                material_id: "a724bd8a-6c61-4cd3-bf8d-0eaedbb0fc49",
+                file_name: "shyam_Santosh_Adhav_Resume.pdf",
+                uploaded_date: "2025-03-28T11:28:19.593Z",
+                class_name: "MCA",
+            },
+            {
+                material_id: "a724bd8a-6c6-4cd3-bf8d-0eaedbb0fc49",
+                file_name: "zravin_Santosh_Adhav_Resume.pdf",
+                uploaded_date: "2025-03-28T11:28:19.593Z",
+                class_name: "MCA",
+            },
+        ];
+        // setMaterials(mockData);
+        setMaterials([]);
     };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(event.target.files || []);
-        setSelectedFiles(files);
-    };
-
-    const handleClassChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedClass(event.target.value);
-    };
-
-    const handleUpload = async () => {
-        if (selectedFiles.length === 0) {
-            toast.error("Please select a file.");
-            return;
-        }
-
-        if (!selectedClass) {
-            toast.error("Please select a class.");
-            return;
-        }
-
-        setUploading(true);
-        try {
-            const formData = new FormData();
-            selectedFiles.forEach((file) => {
-                formData.append("files", file); // Use 'files' as the key for multiple files
-            });
-            formData.append("class", selectedClass); // Add the class to the form data
-
-            await axios.post("/api/materials/upload", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
+    const columns: ColumnDef<Material>[] = useMemo(
+        () => [
+            {
+                id: "index",
+                header: "#",
+                cell: ({ row }) => {
+                    return <div>{row.index + 1}</div>;
                 },
-            });
+            },
+            {
+                accessorKey: "file_name",
+                header: "Filename",
+            },
+            {
+                accessorKey: "class_name",
+                header: "Class",
+            },
+            {
+                accessorKey: "uploaded_date",
+                header: "Date",
+            },
+            {
+                id: "actions",
+                header: "Actions",
+                cell: ({ row }) => (
+                    <div className="flex gap-2">
+                        <Button
+                            variant="secondary"
+                            size="icon"
+                            onClick={() =>
+                                window.open(
+                                    `/api/download?filename=${row.original.file_name}`,
+                                    "_blank"
+                                )
+                            }
+                        >
+                            <Download className="h-4 w-4" />
+                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="icon">
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        Are you absolutely sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will
+                                        permanently delete the material from our
+                                        servers.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={() => {
+                                            alert("delete");
+                                        }}
+                                    >
+                                        Continue
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
+                ),
+            },
+        ],
+        []
+    );
 
-            toast.success("Files uploaded successfully!");
-            fetchMaterials(); // Refresh the list after upload
-            setSelectedFiles([]);
-            setSelectedClass("");
-        } catch (error) {
-            console.error("Error uploading files:", error);
-            toast.error("Failed to upload files.");
-        } finally {
-            setUploading(false);
-        }
-    };
-
-    const handleDelete = async (id: string) => {
-        try {
-            await axios.delete(`/api/materials/${id}`);
-            toast.success("File deleted successfully!");
-            fetchMaterials(); // Refresh the list after deletion
-        } catch (error) {
-            console.error("Error deleting file:", error);
-            toast.error("Failed to delete file.");
-        }
-    };
+    const table = useReactTable({
+        data: materials,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        onSortingChange: setSorting,
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        state: {
+            sorting,
+            globalFilter,
+            pagination,
+        },
+        onGlobalFilterChange: setGlobalFilter,
+        onPaginationChange: setPagination,
+    });
 
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Materials</h1>
 
-            {/* File Upload Section */}
-            <div className="mb-4 flex flex-col justify-center items-center">
-                {/* Class Selection Dropdown */}
-                <select
-                    value={selectedClass}
-                    onChange={handleClassChange}
-                    className="shadow appearance-none border rounded w-full md:w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-3"
-                >
-                    <option value="">Select Class</option>
-                    {classes.map((className) => (
-                        <option key={className} value={className}>
-                            {className}
-                        </option>
-                    ))}
-                </select>
-                <input
-                    type="file"
-                    multiple
-                    onChange={handleFileChange}
-                    className="mb-2"
-                />
-                <button
-                    onClick={handleUpload}
-                    disabled={
-                        uploading ||
-                        selectedFiles.length === 0 ||
-                        !selectedClass
-                    }
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-                >
-                    {uploading ? "Uploading..." : "Upload"}
-                </button>
-            </div>
+            <Input
+                type="text"
+                placeholder="Search materials..."
+                value={globalFilter ?? ""}
+                onChange={(e) => setGlobalFilter(e.target.value)}
+                className="mb-4 w-full max-w-md rounded-md shadow-sm focus:ring-2 border-green-400 focus:ring-blue-500 focus:border-blue-500 text-lg"
+            />
 
-            {/* File List Section */}
-            <div>
-                <h2 className="text-xl font-semibold mb-2">Uploaded Files</h2>
-                {materials.length === 0 ? (
-                    <p>No files uploaded yet.</p>
-                ) : (
-                    <ul className="list-disc pl-5">
-                        {materials.map((material) => (
-                            <li key={material.id} className="mb-2">
-                                <a
-                                    href={material.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-500 hover:underline"
-                                >
-                                    {material.filename}
-                                </a>
-                                <button
-                                    onClick={() => handleDelete(material.id)}
-                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2"
-                                >
-                                    Delete
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
+            {materials.length === 0 ? (
+                <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-sm border border-gray-100">
+                    <div className="h-24 w-24 rounded-full bg-green-50 flex items-center justify-center mb-4">
+                        <FileText size={48} className="text-green-500" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No Materials Available</h3>
+                    <p className="text-gray-500 text-center mb-6 max-w-md">
+                        You haven't uploaded any study materials yet. Upload documents, presentations or other resources for your students.
+                    </p>
+                    <Button className="bg-green-600 hover:bg-green-700">
+                        <FileUp className="mr-2 h-4 w-4" /> Upload New Material
+                    </Button>
+                </div>
+            ) : (
+                <>
+                    <div className="overflow-x-auto">
+                        <Table className="bg-white rounded-md shadow-sm w-full">
+                            <TableHeader>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <TableRow key={headerGroup.id}>
+                                        {headerGroup.headers.map((header) => {
+                                            return (
+                                                <TableHead
+                                                    key={header.id}
+                                                    className="font-bold"
+                                                >
+                                                    {header.isPlaceholder ? null : (
+                                                        <div
+                                                            {...{
+                                                                className:
+                                                                    header.column.getCanSort()
+                                                                        ? "cursor-pointer select-none"
+                                                                        : "",
+                                                                onClick:
+                                                                    header.column.getToggleSortingHandler(),
+                                                            }}
+                                                        >
+                                                            {flexRender(
+                                                                header.column.columnDef
+                                                                    .header,
+                                                                header.getContext()
+                                                            )}
+                                                            {header.column.getIsSorted() ===
+                                                                "asc" ? (
+                                                                " ▲"
+                                                            ) : header.column.getIsSorted() ===
+                                                              "desc" ? (
+                                                                " ▼"
+                                                            ) : null}
+                                                        </div>
+                                                    )}
+                                                </TableHead>
+                                            );
+                                        })}
+                                    </TableRow>
+                                ))}
+                            </TableHeader>
+                            <TableBody>
+                                {table.getRowModel().rows.map((row) => (
+                                    <TableRow key={row.id} className="cursor-pointer hover:bg-gray-100">
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+
+                    <div className="flex items-center justify-between mt-4">
+                        <div className="flex-1 text-sm text-muted-foreground">
+                            {table.getRowModel().rows.length} of{" "}
+                            {materials.length} row(s)
+                        </div>
+                        <div className="space-x-2">
+                            <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => table.previousPage()}
+                                disabled={!table.getCanPreviousPage()}
+                            >
+                                Previous
+                            </Button>
+                            <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => table.nextPage()}
+                                disabled={!table.getCanNextPage()}
+                            >
+                                Next
+                            </Button>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 };
