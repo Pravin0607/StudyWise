@@ -23,9 +23,12 @@ const useUserStore = create<UserStore>()(
         token: '',
       },
       setUser: (user) => set({ user }),
-      logout: () => set({ 
+      logout: () => {set({ 
         user: { name: '', email: '', role: '', token: '' }
-      }),
+      })
+      // clear all localStorage
+      localStorage.clear();
+    },
       setRole: (role) => set((state) => ({
         user: { ...state.user, role }
       })),
