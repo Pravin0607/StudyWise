@@ -43,11 +43,11 @@ const items = [
         url: "/teacher/students",
         icon: Users,
     },
-    {
-        title: "Calendar",
-        url: "/teacher/calendar",
-        icon: Calendar,
-    },
+    // {
+    //     title: "Calendar",
+    //     url: "/teacher/calendar",
+    //     icon: Calendar,
+    // },
     // {
     //     title: "Assignments",
     //     url: "#",
