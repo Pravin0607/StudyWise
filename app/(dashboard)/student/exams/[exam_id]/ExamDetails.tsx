@@ -111,8 +111,19 @@ const ExamPage: React.FC = () => {
     const [showQuestionPalette, setShowQuestionPalette] = useState(true);
     const [isExamFinished, setIsExamFinished] = useState(false);
     const [showInstructions, setShowInstructions] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
     const currentQuestion = sampleQuestions[currentQuestionIndex];
+
+    useEffect(() => {
+        const checkIsMobile = () => {
+            setIsMobile(window.innerWidth <= 768); // Adjust 768px as needed
+        };
+
+        checkIsMobile();
+        window.addEventListener("resize", checkIsMobile);
+        return () => window.removeEventListener("resize", checkIsMobile);
+    }, []);
 
     useEffect(() => {
         let timer: NodeJS.Timeout;
@@ -174,7 +185,7 @@ const ExamPage: React.FC = () => {
     const renderExamContent = () => {
         if (isExamFinished) {
             return (
-                <div className="flex-1 p-6 flex items-center justify-center">
+                <div className="flex-1 p-4 sm:p-6 flex items-center justify-center">
                     <div className="text-center space-y-4">
                         <CheckCircle className="w-12 h-12 text-green-500 mx-auto" />
                         <h2 className="text-2xl font-semibold">
@@ -190,7 +201,7 @@ const ExamPage: React.FC = () => {
         }
 
         return (
-            <div className="w-4/5 p-4">
+            <div className="w-full sm:w-4/5 p-4">
                 <h3 className="text-base font-semibold mb-2 flex justify-between items-center">
                     <span className="text-sm font-normal text-gray-500">
                         Question {currentQuestionIndex + 1} of{" "}
@@ -201,7 +212,7 @@ const ExamPage: React.FC = () => {
                 <h3 className="text-base font-semibold mb-2">
                     {currentQuestion.question}
                 </h3>
-                <div className="space-y-1 mb-4">
+                <div className="space-y-2 mb-4">
                     {currentQuestion.options.map((option, index) => (
                         <div
                             key={index}
@@ -221,7 +232,7 @@ const ExamPage: React.FC = () => {
                         </div>
                     ))}
                 </div>
-                <div className="flex justify-center space-x-8">
+                <div className="flex justify-center space-x-4 sm:space-x-8 flex-wrap gap-4">
                     <Button
                         onClick={handlePreviousQuestion}
                         disabled={currentQuestionIndex === 0}
@@ -262,7 +273,7 @@ const ExamPage: React.FC = () => {
 
     return (
         <div className="h-screen flex flex-col">
-            <div className="flex justify-between p-4 border-b bg-gray-100">
+            <div className="flex justify-between flex-col md:flex-row p-4 border-b bg-gray-100 flex-wrap gap-4 items-center">
                 <h2 className="text-lg font-bold">Exam Name</h2>
                 {examStarted && (
                     <div className="flex items-center gap-4">
@@ -274,13 +285,13 @@ const ExamPage: React.FC = () => {
                 <Button
                     variant="outline"
                     onClick={() => setShowInstructions(true)}
-                    className="ml-4"
+                    className="md:ml-4"
                 >
                     View Instructions
                 </Button>
             </div>
             {currentPage === "instructions" ? (
-                <div className="max-w-4xl mx-auto p-6 border rounded-md shadow-md mt-4">
+                <div className="max-w-4xl mx-auto p-4 sm:p-6 border rounded-md shadow-md mt-4">
                     <h2 className="text-xl font-bold mb-4">Exam Details</h2>
                     <p className="text-sm text-gray-600 mb-2">
                         Exam Duration: 1 Hour
@@ -302,13 +313,13 @@ const ExamPage: React.FC = () => {
                     </Button>
                 </div>
             ) : (
-                <div className="flex h-full">
-                    {showQuestionPalette && (
-                        <div className="w-1/5 p-4 border-r bg-gray-200 flex flex-col">
+                <div className="flex flex-col sm:flex-row h-full">
+                    {showQuestionPalette && !isMobile && (
+                        <div className="w-full sm:w-1/5 p-4 border-r bg-gray-200 flex flex-col">
                             <h3 className="text-md font-bold mb-2">
                                 Question Palette
                             </h3>
-                            <div className="grid grid-cols-3 gap-2">
+                            <div className="grid grid-cols-4 gap-2">
                                 {sampleQuestions.map((question, index) => (
                                     <Button
                                         key={question.id}
@@ -351,7 +362,7 @@ const ExamPage: React.FC = () => {
                 </div>
             )}
             <Dialog open={showModal} onOpenChange={setShowModal}>
-                <DialogContent className="flex justify-center text-center flex-col bg-white rounded-lg shadow-md p-6">
+                <DialogContent className="flex justify-center text-center flex-col bg-white rounded-lg shadow-md p-4 sm:p-6">
                     <DialogHeader>
                         <DialogTitle className="flex justify-center text-center text-xl font-semibold text-gray-800">
                             Confirm Submission
@@ -394,6 +405,53 @@ const ExamPage: React.FC = () => {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            {showQuestionPalette &&
+                isMobile &&
+                currentPage !==
+                    "instructions" &&(
+                        <div className="w-full sm:w-1/5 p-4 border-r bg-gray-200 flex flex-col">
+                            <h3 className="text-md font-bold mb-2">
+                                Question Palette
+                            </h3>
+                            <div className="grid grid-cols-5 gap-2">
+                                {sampleQuestions.map((question, index) => (
+                                    <Button
+                                        key={question.id}
+                                        variant="outline"
+                                        className={cn("w-full text-black", {
+                                            "bg-blue-600 text-white":
+                                                currentQuestionIndex === index,
+                                            "bg-yellow-500":
+                                                questionStatus[question.id] ===
+                                                "review",
+                                            "bg-green-500":
+                                                questionStatus[question.id] ===
+                                                "attempted",
+                                        })}
+                                        onClick={() =>
+                                            setCurrentQuestionIndex(index)
+                                        }
+                                    >
+                                        {index + 1}
+                                    </Button>
+                                ))}
+                            </div>
+                            <div className="mt-6 pt-4 border-t border-gray-300 text-sm space-y-2">
+                                <p className="flex items-center gap-2">
+                                    <span className="bg-blue-600 text-white px-2 py-1 rounded"></span>
+                                    Answered
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <span className="bg-yellow-500 text-white px-2 py-1 rounded"></span>
+                                    Marked for Review
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <span className="bg-white border-gray-300 border px-2 py-1 rounded"></span>
+                                    Not Visited
+                                </p>
+                            </div>
+                        </div>
+                    )}
             <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
