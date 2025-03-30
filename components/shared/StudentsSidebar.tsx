@@ -13,34 +13,35 @@ const items = [
         url: "/student/dashboard",
         icon: Home,
     },
+    // {
+    //     title: "Statistics",
+    //     url: "#",
+    //     icon: Inbox,
+    // },
     {
-        title: "Statistics",
-        url: "#",
-        icon: Inbox,
-    },
-    {
-        title: "My Courses",
+        title: "My Classes",
         url: "#",
         icon: BookOpen,
     },
-    {
-        title: "Enroll",
-        url: "#",
-        icon: GraduationCap,
-    },
-    {
-        title: "Library",
-        url: "#",
-        icon: Library,
-    },
-    {
-        title: "Tutorials",
-        url: "#",
-        icon: Calendar,
-    },
+    // {
+    //     title: "Enroll",
+    //     url: "#",
+
+    //     icon: GraduationCap,
+    // },
+    // {
+    //     title: "Library",
+    //     url: "#",
+    //     icon: Library,
+    // },
+    // {
+    //     title: "Tutorials",
+    //     url: "#",
+    //     icon: Calendar,
+    // },
     {
         title: "Settings",
-        url: "#",
+        url: "/student/settings",
         icon: Settings,
     },
 ];

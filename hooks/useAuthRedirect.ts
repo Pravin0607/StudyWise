@@ -12,7 +12,12 @@ export function useAuthRedirect() {
     // Check if user has a token (is logged in)
     if (user.token) {
       // Redirect to home page
-      router.replace('/home');
+      if(user.role ==='teacher')
+      {
+        router.replace('/teacher/dashboard');
+      }else{
+        router.replace('/student/dashboard');
+      }
     }
   }, [router, user.token]);
   

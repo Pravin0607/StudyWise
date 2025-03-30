@@ -35,5 +35,8 @@ export const Endpoints={
         GETMATERIALSBYTEACHER: `${base_url}/material/get-materials-by-teacher`,
         // DELETE
         DELETEMATERIAL: `${base_url}/material/delete-material/:material_id`,
+    },
+    COMMON:{
+        UPDATEUSER:`${base_url}/common/update-user`,
     }
 }
