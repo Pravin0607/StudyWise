@@ -2,20 +2,35 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Mail, Phone, User, User2 } from "lucide-react";
-
+import { useEffect, useState } from "react";
+import axios from "axios";
+import useUserStore from "@/store/userStore";
+import { Endpoints } from "@/lib/apiEndpoints";
+import { useClassStudent } from "@/store/useClassStudent";
 interface Teacher {
-    name: string;
     email: string;
-    contact: string;
+    first_name:string;
+    last_name:string;
+    mobile_no:string;
+    user_id:string;
 }
 
-const staticTeacher: Teacher = {
-    name: "Professor Anya Sharma",
-    email: "anya.sharma@techinstitute.edu",
-    contact: "+91 9876543210",
-};
 
 const TeacherDetails = () => {
+    const class_id=useClassStudent(s=>s.selectedClass?.class_id);
+    const [TeacherDetails, setTeacherDetails] = useState<Teacher | null>(null);
+    const token=useUserStore((state)=>state.user.token);
+    useEffect(()=>{
+        (async()=>{
+            // Simulate an API call to fetch teacher detail
+            const resp=await axios.get(Endpoints.STUDENT.GETTEACHERDETAILS.replace(":classId",class_id!),{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            setTeacherDetails(resp.data.teacher);
+        })();
+    },[])
     return (
         <Card className="bg-white shadow-md border border-gray-200">
             <CardHeader>
@@ -33,7 +48,7 @@ const TeacherDetails = () => {
                                 Name:
                             </span>
                             <span className="text-gray-900 text-lg">
-                                {staticTeacher.name}
+                                {TeacherDetails?.first_name+" "+TeacherDetails?.last_name}
                             </span>
                         </div>
                         <div className="flex items-center gap-3">
@@ -42,7 +57,7 @@ const TeacherDetails = () => {
                                 Email:
                             </span>
                             <span className="text-gray-900 text-lg">
-                                {staticTeacher.email}
+                                {TeacherDetails?.email}
                             </span>
                         </div>
                         <div className="flex items-center gap-3">
@@ -54,7 +69,7 @@ const TeacherDetails = () => {
                                 Contact:
                             </span>
                             <span className="text-gray-900 text-lg">
-                                {staticTeacher.contact}
+                                {TeacherDetails?.mobile_no}
                             </span>
                         </div>
                     </div>

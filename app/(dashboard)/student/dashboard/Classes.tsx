@@ -4,39 +4,16 @@ import Link from "next/link";
 import useUserStore from "@/store/userStore";
 import useClassStore from "@/store/useClassStore";
 import { Separator } from "@radix-ui/react-select";
+import { useClassStudent } from "@/store/useClassStudent";
+import { useEffect } from "react";
 
 const Classes = () => {
-    const classList = [
-        {
-            class_id: "123456",
-            class_name: "Class 1",
-            students: 10,
-            exams: 5,
-        },
-        {
-            class_id: "234567",
-            class_name: "Advanced Mathematics",
-            students: 22,
-            exams: 4,
-        },
-        {
-            class_id: "345678",
-            class_name: "Introduction to Computer Science",
-            students: 15,
-            exams: 6,
-        },
-        {
-            class_id: "456789",
-            class_name: "World History",
-            students: 18,
-            exams: 3,
-        },
-    ];
-    const { selectClass } = useClassStore();
-    const {
-        user: { token },
-    } = useUserStore();
-
+    const {classList,selectedClass,setSelectedClass,fetchClassList}=useClassStudent();
+    useEffect(()=>{
+        (async()=>{
+            await fetchClassList();
+        })();
+    },[])
     return (
         <div>
             <div className="text-2xl font-bold text-gray-800 tracking-tight">
@@ -52,7 +29,7 @@ const Classes = () => {
                         <Card
                             className="p-0 h-32 cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden border-l-4 border-indigo-500"
                             onClick={(e) => {
-                                selectClass(classItem.class_id);
+                                setSelectedClass(classItem.class_id);
                             }}
                         >
                             <CardContent className="p-3 flex h-full flex-col justify-between bg-gradient-to-br from-white to-slate-50">
@@ -65,10 +42,10 @@ const Classes = () => {
                                 <div className="mt-auto">
                                     <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
                                         <span>
-                                            Students: {classItem.students || 0}
+                                            Students: {classItem.total_students || 0}
                                         </span>
                                         <span>
-                                            Exams: {classItem.exams || 0}
+                                            Exams: {classItem.total_exams || 0}
                                         </span>
                                     </div>
                                 </div>
