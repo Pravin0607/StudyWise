@@ -3,19 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { BookOpen, Users, Calendar } from "lucide-react"; 
 
-interface Class {
-    name: string;
-    date: string; 
-    students: number;
-}
 
-const staticClass: Class = {
-    name: "Mathematics 101",
-    date: "2024-03-15", 
-    students: 30,
-};
-
-const ClassDetails = () => {
+const ClassDetails = ({name,start_date,students}:{name:string,start_date:string,students:number}) => {
     return (
         <Card className="bg-white shadow-md border border-gray-200">
             <CardHeader>
@@ -36,7 +25,7 @@ const ClassDetails = () => {
                                 Class Name:
                             </span>
                             <span className="text-gray-900 text-lg">
-                                {staticClass.name}
+                                {name}
                             </span>
                         </div>
                         <div className="flex items-center gap-3">
@@ -49,7 +38,7 @@ const ClassDetails = () => {
                                 Start Date:
                             </span>
                             <span className="text-gray-900 text-lg">
-                                {staticClass.date}
+                                {start_date}
                             </span>
                         </div>
                         <div className="flex items-center gap-3">
@@ -61,7 +50,7 @@ const ClassDetails = () => {
                                 Students:
                             </span>
                             <span className="text-gray-900 text-lg">
-                                {staticClass.students}
+                                {students}
                             </span>
                         </div>
                     </div>

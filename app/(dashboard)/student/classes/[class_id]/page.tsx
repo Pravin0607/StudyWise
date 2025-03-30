@@ -5,42 +5,18 @@ import { useTheme } from "next-themes";
 import { MaterialsCard } from "./MaterialsCard";
 import { ExamsCard } from "./ExamsCard";
 import { ArrowLeft, CircleArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import TeacherDetails from "./TeacherDetails";
 import ClassDetails from "./ClassDetails";
+import { useClassStudent } from "@/store/useClassStudent";
 
 // Keep your sample data here
-interface Student {
-    id: string;
-    name: string;
-}
-
-interface Material {
-    id: string;
-    title: string;
-    type: string; 
-}
-
-
-const sampleMaterials: Material[] = [
-    { id: "1", title: "Introduction to React", type: "Lecture" },
-    { id: "2", title: "Props and State", type: "Lecture" },
-    { id: "3", title: "Component Lifecycle", type: "Assignment" },
-    { id: "4", title: "Hooks Explained", type: "Lecture" },
-    { id: "5", title: "Midterm Exam", type: "Quiz" },
-];
-
-const sampleExams = [
-    { id: 1, title: "chapter 1 Exam", type: "MCQ" },
-    { id: 2, title: "chapter 2 Exam", type: "Descriptive" },
-];
 
 const ClassDashboard = () => {
     const { theme } = useTheme();
     const router = useRouter();
-    const class_details = {
-        class_name: "React Class"
-    }
+    // const { class_id } = useParams();
+    const {selectedClass}=useClassStudent();
 
     const themeStyles = {
         textColor: theme === "dark" ? "text-gray-200" : "text-gray-800",
@@ -70,15 +46,15 @@ const ClassDashboard = () => {
                         themeStyles.textColor
                     )}
                 >
-                    Class : <strong>{class_details?.class_name}</strong>
+                    Class : <strong>{selectedClass?.class_name}</strong>
                 </h1>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <MaterialsCard materials={sampleMaterials} {...themeStyles} />
-                <ExamsCard exams={sampleExams} {...themeStyles} />
+                <MaterialsCard {...themeStyles} />
+                <ExamsCard {...themeStyles} />
                 <TeacherDetails />
-                <ClassDetails />
+                <ClassDetails name={selectedClass?.class_name!} start_date={selectedClass?.created_at!} students={selectedClass?.total_students!} />
             </div>
         </div>
     );

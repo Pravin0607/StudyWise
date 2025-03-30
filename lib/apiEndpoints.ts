@@ -38,5 +38,19 @@ export const Endpoints={
     },
     COMMON:{
         UPDATEUSER:`${base_url}/common/update-user`,
+    },
+    STUDENT:{
+        // GET
+        GETCLASSLIST:`${base_url}/student/get-classlist`,
+        // GET
+        GETEXAMLIST: `${base_url}/student/get-examlist`,
+        // GET
+        GETEXAMLISTBYCLASS: `${base_url}/student/get-examlist-by-class/:classId`,
+        // GET
+        GETMATERIALLIST: `${base_url}/student/get-materiallist/:classId`,
+        // GET
+        GETEXAMLISTBYSTUDENT: `${base_url}/student/get-examlist/:classId`,
+        // GET
+        GETTEACHERDETAILS: `${base_url}/student/get-teacherdetails/:classId`,
     }
 }
