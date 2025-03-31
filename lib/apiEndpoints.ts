@@ -54,5 +54,13 @@ export const Endpoints={
         GETEXAMLISTBYSTUDENT: `${base_url}/student/get-examlist/:classId`,
         // GET
         GETTEACHERDETAILS: `${base_url}/student/get-teacherdetails/:classId`,
+    },
+    EXAM:{
+        // GET
+        GETEXAMMETADATA: `${base_url}/exam/metadata/:examId`,
+        // GET 
+        GETEXAM: `${base_url}/exam/:examId`,
+        // PUT
+        UPDATEEXAM: `${base_url}/exam/:examId`,
     }
 }
