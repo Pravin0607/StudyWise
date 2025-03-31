@@ -3,8 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
 import { cn } from "@/lib/utils";
-import { PlusIcon, User, Trash } from 'lucide-react';
+import { PlusIcon, User, Trash, Search } from 'lucide-react';
 import AddStudentModal from './AddStudentModal';
 import useClassStore from '@/store/useClassStore';
 import { useState } from 'react';
@@ -37,8 +38,6 @@ interface StudentsCardProps {
     itemBorderColor: string;
 }
 
-// ...existing code...
-
 export function StudentsCard({
     students,
     textColor,
@@ -51,6 +50,17 @@ export function StudentsCard({
         const selectedClass=useClassStore(state=>state.selectedClass);
         const addStudentToClass=useClassStore(state=>state.addStudent);
         const removeStudent=useClassStore(state=>state.removeStudent);
+        const [searchQuery, setSearchQuery] = useState<string>('');
+
+        // Filter students based on search query
+        const filteredStudents = students.filter(student => {
+            const fullName = `${student.first_name} ${student.last_name}`.toLowerCase();
+            const email = student.email.toLowerCase();
+            const query = searchQuery.toLowerCase();
+            
+            return fullName.includes(query) || email.includes(query);
+        });
+
     return (
         <Card className={cn(cardBgColor, cardBorderColor, "shadow-lg")}>
             <CardHeader>
@@ -65,12 +75,23 @@ export function StudentsCard({
                     </AddStudentModal>
                 </div>
                 <Separator className={separatorColor} />
+                
+                {/* Search input */}
+                <div className="relative mt-2">
+                    <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search students..."
+                        className="pl-8 h-9"
+                    />
+                </div>
             </CardHeader>
             <CardContent>
                 <ScrollArea className="h-72">
                     <div className="space-y-2 text-sm md:text-base">
-                        {students.length > 0 ? (
-                            students.map((student) => (
+                        {filteredStudents.length > 0 ? (
+                            filteredStudents.map((student) => (
                                 <div
                                     key={student.user_id}
                                     className={cn(
@@ -113,8 +134,15 @@ export function StudentsCard({
                         ) : (
                             <div className="flex flex-col items-center justify-center h-60 text-center px-4">
                                 <User className={`h-16 w-16 ${textColor} opacity-20 mb-4`} />
-                                <p className={`${textColor} font-medium`}>No students in this class yet</p>
-                                <p className={`${textColor} opacity-70 text-sm mt-1`}>Click 'Add Student' to assign students to this class</p>
+                                <p className={`${textColor} font-medium`}>
+                                    {searchQuery 
+                                        ? 'No students match your search' 
+                                        : 'No students in this class yet'
+                                    }
+                                </p>
+                                <p className={`${textColor} opacity-70 text-sm mt-1`}>
+                                    {!searchQuery && "Click 'Add Student' to assign students to this class"}
+                                </p>
                             </div>
                         )}
                     </div>

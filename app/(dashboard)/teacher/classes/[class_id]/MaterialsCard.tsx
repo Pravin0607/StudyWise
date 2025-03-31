@@ -3,8 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
 import { cn } from "@/lib/utils";
-import { File, PlusIcon, Trash, Download } from 'lucide-react';
+import { File, PlusIcon, Trash, Download, Search } from 'lucide-react';
 import AddMaterialModal from './AddMaterialModal';
 import {
     AlertDialog,
@@ -21,6 +22,7 @@ import useClassStore from '@/store/useClassStore';
 import useUserStore from '@/store/userStore';
 import {  downloadMaterial, Material } from '@/services/materialsServices';
 import { useMaterialStore } from '@/store/useMaterialStore';
+import { useState } from 'react';
 
 
 interface MaterialsCardProps {
@@ -45,6 +47,13 @@ export function MaterialsCard({
     const selectedClass=useClassStore(state=>state.selectedClass);
     const token=useUserStore(state=>state.user.token);
     const { deleteMaterialById } = useMaterialStore();
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    
+    // Filter materials based on search query
+    const filteredMaterials = materials.filter(material => {
+        return material.file_name.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+    
      const handleDeleteMaterial = async (materialId: string) => {
         // Implement delete logic here
         try {
@@ -83,12 +92,23 @@ export function MaterialsCard({
                     </AddMaterialModal>
                 </div>
                 <Separator className={separatorColor} />
+                
+                {/* Search input */}
+                <div className="relative mt-2">
+                    <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search materials..."
+                        className="pl-8 h-9"
+                    />
+                </div>
             </CardHeader>
             <CardContent>
                 <ScrollArea className="h-72">
                     <div className="space-y-3 text-sm md:text-base">
-                        {materials.length > 0 ? (
-                            materials.map((material) => (
+                        {filteredMaterials.length > 0 ? (
+                            filteredMaterials.map((material) => (
                                 <div
                                     key={material._id}
                                     className={cn(
@@ -139,8 +159,15 @@ export function MaterialsCard({
                         ) : (
                             <div className="flex flex-col items-center justify-center h-60 text-center px-4">
                                 <File className={`h-16 w-16 ${textColor} opacity-20 mb-4`} />
-                                <p className={`${textColor} font-medium`}>No materials available</p>
-                                <p className={`${textColor} opacity-70 text-sm mt-1`}>Click 'Add Material' to upload study resources</p>
+                                <p className={`${textColor} font-medium`}>
+                                    {searchQuery 
+                                        ? 'No materials match your search' 
+                                        : 'No materials available'
+                                    }
+                                </p>
+                                <p className={`${textColor} opacity-70 text-sm mt-1`}>
+                                    {!searchQuery && "Click 'Add Material' to upload study resources"}
+                                </p>
                             </div>
                         )}
                     </div>

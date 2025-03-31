@@ -23,6 +23,8 @@ export const Endpoints={
         GETSTUDENTSBYSEARCH:`${base_url}/teacher/get-students`,
         // POST
         CREATEEXAM:`${base_url}/teacher/create-exam`,
+        // 
+        DELETEEXAM:`${base_url}/teacher/delete-exam/:examId`,
     },
     MATERIALS:{
         // POST

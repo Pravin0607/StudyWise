@@ -13,17 +13,7 @@ import useUserStore from '@/store/userStore';
 import { useMaterialStore } from '@/store/useMaterialStore';
 
 // Keep your sample data here
-interface Student {
-    id: string;
-    name: string;
-}
 
-
-
-const sampleExams=[
-    {id:1,title:"chapter 1 Exam",type:'MCQ'},
-    {id:2,title:'chapter 2 Exam',type:'Descriptive'}
-]
 
 const ClassDashboard = () => {
     const { theme } = useTheme();
@@ -79,7 +69,6 @@ const ClassDashboard = () => {
                     {...themeStyles}
                 />
                 <ExamsCard
-                    exams={sampleExams}
                     {...themeStyles}
                 />
             </div>
