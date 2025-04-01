@@ -29,7 +29,11 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Link from 'next/link';
+import useExamResultStore from '@/store/useExamResult';
+// import { Badge } from "@/components/ui/badge"
+import { Label } from '@/components/ui/label';
 
 interface Exam {
     exam_id: string;
@@ -66,6 +70,9 @@ export function ExamsCard({
         useState<'all' | 'completed' | 'pending'>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
+    const {fetchExamResults,examResults}=useExamResultStore();
+    const [open, setOpen] = useState(false);
+    const [selectedExamResult, setSelectedExamResult] = useState<any | null>(null);
 
     const sortedExamsList = [...examsList].sort((a, b) => {
         const [dayA, monthA, yearA] = a.date.split('-').map(Number);
@@ -104,6 +111,7 @@ export function ExamsCard({
                     }
                 );
                 setExamsList(resp?.data || []);
+                await fetchExamResults();
             } catch (error) {
                 console.error('Error fetching class list:', error);
                 toast.error('Error fetching class list');
@@ -122,7 +130,7 @@ export function ExamsCard({
         const now = new Date().setHours(0, 0, 0, 0);
         const [day, month, year] = exam.date.split('-').map(Number);
         const examDate=new Date(`${month}-${day}-${year}`).getTime();
-        if(now> examDate) return false;
+        if(now> examDate || now<examDate) return false;
         if(now=== examDate) {
                 // start_time = "08:10 PM"
                 // end_time = "10:00 PM"
@@ -143,6 +151,12 @@ export function ExamsCard({
                 return ((nowHours > startHours || (nowHours === startHours && nowMinutes >= startMinutes)) && ((nowHours < endHours || (nowHours === endHours && nowMinutes <= endMinutes))));
         }
         return false;
+    };
+
+    const handleViewScore = (exam: Exam) => {
+        const examResult = examResults?.find((result) => result.exam_id === exam.exam_id);
+        setSelectedExamResult(examResult);
+        setOpen(true);
     };
 
     return (
@@ -199,7 +213,8 @@ export function ExamsCard({
                 <ScrollArea className="h-72">
                     <div className="space-y-3 text-sm md:text-base">
                         {filteredExamsList.length > 0 ? (
-                            filteredExamsList.map((exam) => (
+                            filteredExamsList.map((exam) => {
+                                return(
                                 <div
                                     key={exam.exam_id}
                                     className={cn(
@@ -210,34 +225,88 @@ export function ExamsCard({
                                         textColor,
                                         'border',
                                         'group hover:bg-accent/10 transition-colors duration-200',
-                                        'flex justify-between items-center flex-col sm:flex-row'
+                                        'flex justify-between items-center sm:flex-row'
                                     )}
                                 >
-                                    <div className="flex gap-x-3 items-center cursor-pointer mb-2 sm:mb-0">
-                                        <File
-                                            className={cn(
-                                                'transition-colors',
-                                                exam.isCompleted
-                                                    ? 'text-green-500'
-                                                    : 'text-blue-500'
-                                            )}
-                                        />
-                                        <span
-                                            className={cn(
-                                                'transition-colors font-medium',
-                                                exam.isCompleted
-                                                    ? 'text-green-700 dark:text-green-300'
-                                                    : 'text-blue-700 dark:text-blue-300'
-                                            )}
-                                        >
+                                    <div className="flex-grow">
+                                        <div className="font-medium">
                                             {exam.title}
-                                        </span>
+                                        </div>
+                                        <div className="text-sm text-muted-foreground">
+                                            {exam.date} ({exam.start_time} - {exam.end_time})
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="font-semibold mr-2 hidden sm:inline">
-                                            {exam.date}
-                                        </span>
-                                        {!exam.isCompleted ? (
+                                    <div className="flex items-center">
+                                        {exam.isCompleted || examResults?.some((result) => result.exam_id === exam.exam_id) ? (
+                                            <Dialog open={open} onOpenChange={setOpen}>
+                                                <DialogTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        className="hover:bg-accent hover:text-accent-foreground bg-green-100 border-green-300 text-green-700 dark:bg-green-900/50 dark:border-green-700 dark:text-green-300"
+                                                        onClick={() => handleViewScore(exam)}
+                                                    >
+                                                        View Score
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="sm:max-w-[425px] bg-white/90 backdrop-blur-sm dark:bg-gray-900/90">
+                                                    <DialogHeader>
+                                                        <DialogTitle className="text-2xl font-bold text-center">Exam Result</DialogTitle>
+                                                        <DialogDescription className="text-center text-lg font-medium text-gray-600 dark:text-gray-300">
+                                                            {exam.title}
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    {selectedExamResult ? (
+                                                        <div className="space-y-6 py-4">
+                                                            <div className="rounded-lg bg-gradient-to-r from-blue-50 to-green-50 p-6 dark:from-blue-900/30 dark:to-green-900/30">
+                                                                <div className="text-center mb-4">
+                                                                    <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">
+                                                                        {selectedExamResult.percentage}%
+                                                                    </div>
+                                                                    <div className="text-sm text-gray-500 dark:text-gray-400">Overall Score</div>
+                                                                </div>
+                                                                
+                                                                <div className="space-y-4">
+                                                                    <div className="flex justify-between items-center">
+                                                                        <span className="text-gray-600 dark:text-gray-300">Marks Obtained</span>
+                                                                        <span className="font-semibold text-green-600 dark:text-green-400">
+                                                                            {selectedExamResult.total_marks_obtained}
+                                                                        </span>
+                                                                    </div>
+                                                                    
+                                                                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                                        <div 
+                                                                            className="h-full bg-gradient-to-r from-blue-500 to-green-500"
+                                                                            style={{ 
+                                                                                width: `${(selectedExamResult.total_marks_obtained / selectedExamResult.total_possible_marks) * 100}%` 
+                                                                            }}
+                                                                        />
+                                                                    </div>
+                                                                    
+                                                                    <div className="flex justify-between items-center">
+                                                                        <span className="text-gray-600 dark:text-gray-300">Total Marks</span>
+                                                                        <span className="font-semibold text-blue-600 dark:text-blue-400">
+                                                                            {selectedExamResult.total_possible_marks}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+                                                            No result found for this exam.
+                                                        </div>
+                                                    )}
+                                                    <DialogFooter>
+                                                        <Button 
+                                                            onClick={() => setOpen(false)}
+                                                            className="bg-gradient-to-r from-blue-500 to-green-500 text-white hover:opacity-90"
+                                                        >
+                                                            Close
+                                                        </Button>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+                                        ) : (
                                             <AlertDialog>
                                                 <AlertDialogTrigger asChild>
                                                     <Button
@@ -282,17 +351,10 @@ export function ExamsCard({
                                                         </AlertDialogFooter>
                                                 </AlertDialogContent>
                                             </AlertDialog>
-                                        ) : (
-                                            <Button
-                                                variant="outline"
-                                                className="hover:bg-accent hover:text-accent-foreground bg-green-100 border-green-300 text-green-700 dark:bg-green-900/50 dark:border-green-700 dark:text-green-300"
-                                            >
-                                                View Score
-                                            </Button>
                                         )}
                                     </div>
                                 </div>
-                            ))
+                            )})
                         ) : (
                             <div className="flex flex-col items-center justify-center h-60 text-center px-4">
                                 <File

@@ -1,8 +1,8 @@
 import {create} from 'zustand';
-import { devtools } from 'zustand/middleware';
+import { devtools ,persist, createJSONStorage } from 'zustand/middleware';
 import useUserStore from './userStore';
 import axios from 'axios';
-import toast, { Toast } from 'react-hot-toast'; 
+import toast from 'react-hot-toast'; 
 import { Endpoints } from '@/lib/apiEndpoints';
 // useUserStore contains the user token state.user.token
 
@@ -61,6 +61,7 @@ interface ExamStoreMethods{
     setExamStartedTime: ()=>void;
     setExamEndedTime: ()=>void;
     submitExam: ()=>Promise<void>;
+    
 }
 
 const useStudentExamStore = create<ExamStoreState & ExamStoreMethods>()(
@@ -197,8 +198,8 @@ const useStudentExamStore = create<ExamStoreState & ExamStoreMethods>()(
                 toast.error("Failed to submit exam",{id});
             }
         },
-
-}))
+}
+))
 )
 
 export default useStudentExamStore;

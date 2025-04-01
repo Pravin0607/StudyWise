@@ -45,7 +45,8 @@ const LogIn = () => {
           name: `${response.data.user.firstName} ${response.data.user.lastName}`,
           email: response.data.user.email,
           role: response.data.user.role,
-          token: response.data.token
+          token: response.data.token,
+          id: response.data.user.userId,
         });
         
         toast.success("Login successful!");
