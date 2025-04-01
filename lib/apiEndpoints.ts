@@ -62,5 +62,9 @@ export const Endpoints={
         GETEXAM: `${base_url}/exam/:examId`,
         // PUT
         UPDATEEXAM: `${base_url}/exam/:examId`,
+        // POST
+        SUBMITEXAM: `${base_url}/exam/submit`,
+        // GET
+        EXAMRESULTBYSTUDENTID:`${base_url}/exam/results/:studentId`
     }
 }

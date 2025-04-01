@@ -116,7 +116,6 @@ export function ExamsCard({
     };
 
     const canTakeExam = (exam: Exam): boolean => {
-        console.log('Exam:', exam);
         // exam.date = "31-03-2025"
         // end_time = "10:00 PM"
         // start_time = "08:10 PM"
@@ -254,7 +253,7 @@ export function ExamsCard({
                                                                 <AlertDialogTitle className="text-lg font-semibold">
                                                                         {exam.title}
                                                                 </AlertDialogTitle>
-                                                                <AlertDialogDescription className="text-sm text-gray-500 dark:text-gray-400">
+                                                                <AlertDialogDescription asChild className="text-sm text-gray-500 dark:text-gray-400">
                                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                                                 <div>
                                                                                         <span className="font-medium">Date:</span> {exam.date}

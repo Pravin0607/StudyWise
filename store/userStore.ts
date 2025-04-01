@@ -7,6 +7,7 @@ type UserStore = {
     email: string;
     role: string;
     token?: string;
+    id?: string;
   };
   setUser: (user: UserStore['user']) => void;
   logout: () => void;
@@ -21,10 +22,11 @@ const useUserStore = create<UserStore>()(
         email: '',
         role: '',
         token: '',
+        id: '',
       },
       setUser: (user) => set({ user }),
       logout: () => {set({ 
-        user: { name: '', email: '', role: '', token: '' }
+        user: { name: '', email: '', role: '', token: '' , id: '' }
       })
       // clear all localStorage
       localStorage.clear();

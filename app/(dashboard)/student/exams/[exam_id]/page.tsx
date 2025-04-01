@@ -2,30 +2,52 @@
 import React, { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
-import { ArrowLeft, CircleArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import ExamDetails from "./ExamDetails";
+import useStudentExamStore from "@/store/useStudentExamStore";
 
 // Keep your sample data here
-interface Student {
-    id: string;
-    name: string;
-}
-
-interface Material {
-    id: string;
+interface ExamMetaData{
+    exam_id: string;
     title: string;
-    type: string;
+    date: string;
+    start_time: string;
+    end_time: string;
+    total_marks: number;
+    questions: any[];
+    total_questions: number;
 }
+/*
+    "ExamMetaData": {
+        "exam_id": "c69e3633-cc8c-4071-b5c2-8ba179254428",
+        "title": "Semister End",
+        "date": "2025-03-27T00:00:00.000Z",
+        "start_time": "16:00",
+        "end_time": "17:00",
+        "total_marks": 30,
+        "questions": [],
+        "total_questions": 2
+    }
+*/
+
+
+
+
 
 
 const ExamDashboard = () => {
     const { theme } = useTheme();
     const router = useRouter();
-    const exam_details = {
-        exam_name: "React Exam",
-    };
-
+    const {exam_id}=useParams();
+    const exam_details=useStudentExamStore(state=>state.examsMetadata);
+    const {fetchExamMetadata,fetchExamQuestionsWithMetadata}=useStudentExamStore()
+    useEffect(()=>{
+        (async()=>{
+            await fetchExamMetadata(exam_id as string);
+            await fetchExamQuestionsWithMetadata(exam_id as string);
+        })();
+    },[])
     const themeStyles = {
         textColor: theme === "dark" ? "text-gray-200" : "text-gray-800",
         cardBgColor: theme === "dark" ? "bg-gray-800" : "bg-white",
@@ -54,12 +76,12 @@ const ExamDashboard = () => {
                         themeStyles.textColor
                     )}
                 >
-                    Exam Name: <strong>{exam_details?.exam_name}</strong>
+                    Exam Name: <strong>{exam_details?.title}</strong>
                 </h1>
             </div>
 
             <div>
-                <ExamDetails/>
+                <ExamDetails />
             </div>
         </div>
     );
