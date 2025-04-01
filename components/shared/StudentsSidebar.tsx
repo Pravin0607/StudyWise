@@ -20,7 +20,7 @@ const items = [
     // },
     {
         title: "My Classes",
-        url: "#",
+        url: "/student/classes",
         icon: BookOpen,
     },
     // {

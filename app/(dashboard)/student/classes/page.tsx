@@ -1,7 +1,11 @@
-const Classes = () => {
+import Classes from "../dashboard/Classes"
+
+const ClassesPage = () => {
   return (
-    <div>Classes</div>
+    <div>
+      <Classes/>
+    </div>
   )
 }
 
-export default Classes
+export default ClassesPage
