@@ -9,6 +9,12 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
 } from "@tanstack/react-table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -31,18 +37,25 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Trash2, Edit, ClipboardList, PlusCircle } from "lucide-react";
+import { Endpoints } from "@/lib/apiEndpoints";
+import axios from "axios";
+import useUserStore from "@/store/userStore";
+import Link from "next/link";
+import toast from "react-hot-toast";
 
 interface Exam {
   exam_id: string;
   title: string;
-  questions: number;
-  marks: number;
+  class_name: string;
   date: string;
-  "start-time": string;
-  "end-time": string;
+  start_time: string;
+  end_time: string;
+  total_marks: number;
+  questions_count: number;
 }
 
 const ExamCenterPage = () => {
+  const token=useUserStore(state=>state.user.token);
   const [exams, setExams] = useState<Exam[]>([]);
   const [sorting, setSorting] = useState<any>([]);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -55,108 +68,158 @@ const ExamCenterPage = () => {
     fetchExams();
   }, []);
 
+  const handleDeleteExam = async (examId: string) => {
+          // Implement delete logic here
+          try{
+              const resp=await axios.delete(Endpoints.CLASS.DELETEEXAM.replace(':examId', examId),{
+                  headers:{
+                      Authorization:`Bearer ${token}`,
+                  }
+              });
+              if(resp.status===200){
+                  toast.success('Exam deleted successfully');
+                  await fetchExams();
+              }
+          }catch(err)
+          {
+              console.error('Failed to delete exam:', err);
+              toast.error('Failed to delete exam');
+          }
+      };
+
   const fetchExams = async () => {
+    try{
+      const result=await axios.get(Endpoints.EXAM.EXAMLIST,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if(result.status===200){
+        const transformed=result.data.exams.map((exam: Exam) => {
+          return ({
+            ...exam,
+            date: new Date(exam.date).toLocaleDateString(),
+          })
+        });
+        // console.log(result.data.exams);
+
+        setExams(transformed as Exam[]);
+      }else{
+        setExams([]);
+      }
+
+    }catch(err){
+      console.error("Error fetching exams:", err);
+    }
     // Mock data for exams
-    const mockData: Exam[] = [
-      {
-        exam_id: "1",
-        title: "Midterm Exam",
-        questions: 50,
-        marks: 100,
-        date: "2025-04-05",
-        "start-time": "09:00",
-        "end-time": "11:00",
-      },
-      {
-        exam_id: "2",
-        title: "Final Exam",
-        questions: 100,
-        marks: 200,
-        date: "2025-05-15",
-        "start-time": "14:00",
-        "end-time": "17:00",
-      },
-    ];
-    // setExams(mockData);
-    setExams([]);
-    
   };
 
   const columns: ColumnDef<Exam>[] = useMemo(
-    () => [
-      {
-        id: "index",
-        header: "#",
-        cell: ({ row }) => {
-          return <div>{row.index + 1}</div>;
-        },
-      },
-      {
-        accessorKey: "title",
-        header: "Title",
-      },
-      {
-        accessorKey: "questions",
-        header: "Questions",
-      },
-      {
-        accessorKey: "marks",
-        header: "Marks",
-      },
-      {
-        accessorKey: "date",
-        header: "Date",
-      },
-      {
-        accessorKey: "start-time",
-        header: "Start Time",
-      },
-      {
-        accessorKey: "end-time",
-        header: "End Time",
-      },
-      {
-        id: "actions",
-        header: "Actions",
-        cell: ({ row }) => (
-          <div className="flex gap-2">
-            <Button variant="secondary" size="icon">
-              <Edit className="h-4 w-4" />
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="icon">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Are you absolutely sure?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will
-                    permanently delete the exam from our
-                    servers.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => {
-                      alert("delete");
-                    }}
-                  >
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        ),
-      },
-    ],
-    []
+      () => [
+          {
+              id: "index",
+              header: "#",
+              cell: ({ row }) => {
+                  return <div>{row.index + 1}</div>;
+              },
+          },
+          {
+              accessorKey: "title",
+              header: "Title",
+          },
+          {
+              accessorKey: "questions_count",
+              header: "Questions",
+          },
+          {
+              accessorKey: "total_marks",
+              header: "Marks",
+          },
+          {
+              accessorKey: "date",
+              header: "Date",
+          },
+          {
+              accessorKey: "start_time",
+              header: "Start Time",
+          },
+          {
+              accessorKey: "end_time",
+              header: "End Time",
+          },
+          {
+              id: "actions",
+              header: "Actions",
+              cell: ({ row }) => (
+                <div className="flex items-center space-x-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link href={`/teacher/exams/${row.original.exam_id}/edit`}>
+                      <Button variant="secondary" size="icon" className="h-8 w-8">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Edit</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link href={`/teacher/examcenter/result/${row.original.exam_id}`}>
+                        <Button variant="outline" size="icon" className="h-8 w-8">
+                          <ClipboardList className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>View Score</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="icon" className="h-8 w-8">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete
+                              the exam from our servers.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={async () => {
+                                await handleDeleteExam(row.original.exam_id);
+                              }}
+                            >
+                              Continue
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Delete</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              ),
+          },
+      ],
+      []
   );
 
   const table = useReactTable({

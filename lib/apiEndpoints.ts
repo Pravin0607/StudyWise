@@ -65,6 +65,10 @@ export const Endpoints={
         // POST
         SUBMITEXAM: `${base_url}/exam/submit`,
         // GET
-        EXAMRESULTBYSTUDENTID:`${base_url}/exam/results/:studentId`
+        EXAMRESULTBYSTUDENTID:`${base_url}/exam/results/:studentId`,
+        // GET - examlist for teacher
+        EXAMLIST: `${base_url}/teacher/get-exams`,
+        // GET - score of exam by examId
+        EXAMSCOREBYID: `${base_url}/teacher/get-exam-score/:examId`,
     }
 }
