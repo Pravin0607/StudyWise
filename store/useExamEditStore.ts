@@ -6,8 +6,8 @@ import { Endpoints } from "@/lib/apiEndpoints";
 import toast from "react-hot-toast";
 
 interface Question {
-    _id: string;
-    type: string;
+    _id?: string;
+    type?: string;
     question: string;
     choices: string[];
     correctAnswer: string;
@@ -85,13 +85,10 @@ const useExamEditStore = create<ExamEditStoreState & ExamEditStoreMethods>()(
                         return false;
                     }
                     const examId = examData.exam_id;
+                    
                     try {
                         console.log("Exam data to update:", examData);
-                        const response = await axios.put(
-                            Endpoints.EXAM.UPDATEEXAM.replace(
-                                ":exam______Id",
-                                examId
-                            ),
+                        const response = await axios.put(Endpoints.EXAM.UPDATEEXAM.replace(":examId",examId),
                             examData,
                             {
                                 headers: {
@@ -101,10 +98,9 @@ const useExamEditStore = create<ExamEditStoreState & ExamEditStoreMethods>()(
                         );
                         if (response.status === 200) {
                             set({
-                                examQuestionsWithMetadata: response.data
-                                    ?.exam as ExamQuestionsWithMetadata,
+                                examQuestionsWithMetadata: null
                             });
-                            toast.success(response.data.message);
+                            toast.success(response.data.message);                            
                             return true;
                         } else {
                             toast.error(response.data.message);

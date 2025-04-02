@@ -267,7 +267,7 @@ const MetadataUpdateForm = ({gotoNext}:{gotoNext:()=>void}) => {
                 </CardContent>
                 <CardFooter>
                     <Button type="button" onClick={handleSubmit(onSubmit)}>
-                        Update
+                        Update And Go to Questions
                     </Button>
                 </CardFooter>
             </Card>

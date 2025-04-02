@@ -19,8 +19,10 @@ const page = () => {
 })()
     },[exam_id, fetchExamQuestionsWithMetadata])
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="flex h-full w-full flex-col p-2">
+        <div className="flex w-full items-center justify-between">
         <h1 className="text-2xl font-bold">Edit Exam</h1>
+        </div>
         <div className="flex-1">
         {step===0 ? (<MetadataUpdateForm gotoNext={()=>{setStep(1)}}/>): <QuestionUpdateForm/>}
         </div>
