@@ -87,28 +87,40 @@ const Classes = () => {
     };
     
     return (
-        <div>
-            <CreateClassDialog />
-            <EditClassDialog 
-                open={editOpen} 
-                setOpen={setEditOpen} 
-                currentClass={currentClass} 
-                updateClass={updateClass} 
-            />
+        <div className="container mx-auto px-4 py-6">
+            <div className="flex justify-between items-center mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold text-indigo-800">
+                        My Classes
+                    </h1>
+                    <p className="text-gray-600 mt-1">
+                        Manage your teaching classes and courses
+                    </p>
+                </div>
+                <CreateClassDialog />
+            </div>{" "}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full h-full">
                 {classList.map((classItem) => (
-                    <Link href={`/teacher/classes/${classItem.class_id}`} prefetch={true} key={classItem.class_id}>
-                        <Card className="p-0 h-32 cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden border-l-4 border-indigo-500" 
-                            onClick={(e) => { 
+                    <Link
+                        href={`/teacher/classes/${classItem.class_id}`}
+                        prefetch={true}
+                        key={classItem.class_id}
+                    >
+                        <Card
+                            className="p-0 h-32 cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden border-l-4 border-indigo-500"
+                            onClick={(e) => {
                                 selectClass(classItem.class_id);
-                            }}>
+                            }}
+                        >
                             <CardContent className="p-3 flex h-full flex-col justify-between bg-gradient-to-br from-white to-slate-50">
                                 <div className="flex justify-between items-start">
-                                    <h2 className="font-bold text-lg text-indigo-700 pr-16">{classItem.class_name}</h2>
+                                    <h2 className="font-bold text-lg text-indigo-700 pr-16">
+                                        {classItem.class_name}
+                                    </h2>
                                     <div className="flex space-x-1">
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
                                             className="h-7 w-7 p-0 rounded-full hover:bg-blue-50"
                                             onClick={(e) => {
                                                 e.preventDefault();
@@ -119,9 +131,9 @@ const Classes = () => {
                                         >
                                             <Edit className="h-3.5 w-3.5 text-blue-600" />
                                         </Button>
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
                                             className="h-7 w-7 p-0 rounded-full hover:bg-red-50"
                                             onClick={(e) => {
                                                 e.preventDefault();
@@ -134,11 +146,17 @@ const Classes = () => {
                                         </Button>
                                     </div>
                                 </div>
-                                
+
                                 <div className="mt-auto">
                                     <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-                                        <span>Students: {classItem.students?.length || 0}</span>
-                                        <span>Exams: {classItem.exams?.length || 0}</span>
+                                        <span>
+                                            Students:{" "}
+                                            {classItem.students?.length || 0}
+                                        </span>
+                                        <span>
+                                            Exams:{" "}
+                                            {classItem.exams?.length || 0}
+                                        </span>
                                     </div>
                                 </div>
                             </CardContent>
@@ -146,22 +164,28 @@ const Classes = () => {
                     </Link>
                 ))}
             </div>
-
             {/* Delete Alert Dialog */}
             {currentClass && (
-                <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
+                <AlertDialog
+                    open={deleteAlertOpen}
+                    onOpenChange={setDeleteAlertOpen}
+                >
                     <AlertDialogContent>
                         <AlertDialogHeader>
                             <AlertDialogTitle>Delete Class</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Are you sure you want to delete "{currentClass.class_name}"? This action cannot be undone.
+                                Are you sure you want to delete "
+                                {currentClass.class_name}"? This action cannot
+                                be undone.
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction 
+                            <AlertDialogAction
                                 className="bg-red-500 text-white hover:bg-red-600"
-                                onClick={() => deleteClass(currentClass.class_id)}
+                                onClick={() =>
+                                    deleteClass(currentClass.class_id)
+                                }
                             >
                                 Delete
                             </AlertDialogAction>
@@ -169,6 +193,15 @@ const Classes = () => {
                     </AlertDialogContent>
                 </AlertDialog>
             )}
+
+{currentClass && (
+            <EditClassDialog
+                open={editOpen}
+                setOpen={setEditOpen}
+                currentClass={currentClass}
+                updateClass={updateClass}
+            />
+        )}
         </div>
     );
 };
