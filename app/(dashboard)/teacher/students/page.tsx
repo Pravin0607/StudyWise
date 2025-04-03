@@ -21,7 +21,14 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { UserRound } from "lucide-react";
+import { UserRound, FileBarChart } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 interface Student {
   user_id: string; // Added user_id field
@@ -47,20 +54,26 @@ const StudentsPage = () => {
     // Mock data for students
     const mockData: Student[] = [
       {
-        user_id: "usr_001", // Added user_id
-        name: "Pravin Adhav",
-        email_id: "pravin@example.com",
-        classes: ["MCA", "MBA"],
-      },
-      {
-        user_id: "usr_002", // Added user_id
-        name: "Shyam Adhav",
-        email_id: "shyam@example.com",
-        classes: ["BCA"],
-      },
+        "user_id": "6350dfca-e950-4f7b-86a9-a1cab7052f73",
+        "name": "Jagdish Butte",
+        "email_id": "jagdishbutte@gmail.com",
+        "classes": [
+            "MCA-2025",
+            "MBA-2025",
+            "B-Tech - 2026"
+        ]
+    },
+    {
+        "user_id": "2c17a66e-7d18-435b-a655-1dfa74ae5c8d",
+        "name": "John Dev",
+        "email_id": "you@gmail.com",
+        "classes": [
+            "MCA-2025"
+        ]
+    }
     ];
-    // setStudents(mockData);
-    setStudents([]);
+    setStudents(mockData);
+    // setStudents([]);
   };
 
   const columns: ColumnDef<Student>[] = useMemo(
@@ -84,11 +97,50 @@ const StudentsPage = () => {
         accessorKey: "classes",
         header: "Classes",
         cell: ({ row }) => {
-          return <div>{row.original.classes.join(", ")}</div>;
+          return (
+            <div className="flex flex-wrap gap-1">
+              {row.original.classes.map((className, index) => (
+                <Badge 
+                  key={index} 
+                  variant="outline" 
+                  className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                >
+                  {className}
+                </Badge>
+              ))}
+            </div>
+          );
         },
       },
+      {
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-600 hover:to-indigo-700 border-none"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent row click
+                    router.push(`/teacher/students/${encodeURIComponent(row.original.user_id)}/report`);
+                  }}
+                >
+                  <FileBarChart className="h-4 w-4 mr-2" />
+                  View Report
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>View detailed performance report for {row.original.name}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ),
+      },
     ],
-    []
+    [router]
   );
 
   const table = useReactTable({
