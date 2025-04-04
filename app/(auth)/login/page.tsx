@@ -148,7 +148,7 @@ const LogIn = () => {
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
+                    {/* <SelectItem value="admin">Admin</SelectItem> */}
                     <SelectItem value="teacher">Teacher</SelectItem>
                     <SelectItem value="student">Student</SelectItem>
                   </SelectContent>
@@ -193,9 +193,9 @@ const LogIn = () => {
                 <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
                   <Small>Don&#39;t have an account? Sign Up</Small>
                 </Link>
-                <Link href="/forgot-password" className="text-blue-600 hover:text-blue-700 font-medium">
+                {/* <Link href="/forgot-password" className="text-blue-600 hover:text-blue-700 font-medium">
                   <Small>Forgot password?</Small>
-                </Link>
+                </Link> */}
               </div>
             </form>
           </CardContent>

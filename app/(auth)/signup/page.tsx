@@ -11,6 +11,7 @@ import { base_url } from "@/lib/constants"
 import { toast } from "react-hot-toast"
 import { useState } from "react"
 import { useAuthRedirect } from "@/hooks/useAuthRedirect"
+import Link from "next/link";
 interface SignupFormData {
   firstName: string;
   lastName: string;
@@ -222,7 +223,7 @@ const SignIn = () => {
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
+                    {/* <SelectItem value="admin">Admin</SelectItem> */}
                     <SelectItem value="teacher">Teacher</SelectItem>
                     <SelectItem value="student">Student</SelectItem>
                   </SelectContent>
@@ -270,12 +271,12 @@ const SignIn = () => {
               </motion.div>
 
               <div className="flex items-center justify-between text-sm">
-                <a href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+                <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
                   <Small>Already have an account?</Small>
-                </a>
-                <a href="/forgot-password" className="text-blue-600 hover:text-blue-700 font-medium">
+                </Link>
+                {/* <a href="/forgot-password" className="text-blue-600 hover:text-blue-700 font-medium">
                   <Small>Forgot password?</Small>
-                </a>
+                </a> */}
               </div>
             </form>
           </CardContent>
