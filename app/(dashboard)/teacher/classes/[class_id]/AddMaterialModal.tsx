@@ -22,6 +22,7 @@ const AddMaterialModal = ({
     const [error, setError] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const token=useUserStore(state=>state.user.token);
+    const {fetchMaterialsByClassId}=useMaterialStore();
     // const router=useRouter();
     const { uploadNewMaterial } = useMaterialStore();
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +39,13 @@ const AddMaterialModal = ({
             }
 
             Array.from(files).forEach((file) => {
-                if (allowedTypes.includes(file.type)) {
+                const fileType = file.type.toLowerCase();
+                const fileName = file.name.toLowerCase();
+            
+                if (
+                    allowedTypes.includes(fileType) ||
+                    fileName.endsWith('.docx')
+                ) {
                     validFiles.push(file);
                 } else {
                     invalidFiles.push(file.name);
@@ -81,7 +88,7 @@ const AddMaterialModal = ({
             if (onMaterialUpload) {
                 onMaterialUpload(selectedFiles);
             }
-            
+            await fetchMaterialsByClassId(classId, token as string);
             toast.success("Materials uploaded successfully!");
             setOpen(false); // Close the modal after confirmation
             setSelectedFiles([]); // Reset the selected files

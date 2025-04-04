@@ -70,6 +70,10 @@ export const Endpoints={
         EXAMLIST: `${base_url}/teacher/get-exams`,
         // GET - score of exam by examId
         EXAMSCOREBYID: `${base_url}/teacher/get-exam-score/:examId`,
+        // POST
+        AIEXAM:`${base_url}/ai/generate-questions`,
+        // POST
+        SUBMITAIEXAM:`${base_url}/ai/submit-exam`,
     },
     REPORT:{
         STUDENTREPORT: `${base_url}/teacher/get-student-report/:studentId`,

@@ -48,7 +48,7 @@ export function MaterialsCard({
     const token=useUserStore(state=>state.user.token);
     const { deleteMaterialById } = useMaterialStore();
     const [searchQuery, setSearchQuery] = useState<string>('');
-    
+    const {fetchMaterialsByClassId}=useMaterialStore();
     // Filter materials based on search query
     const filteredMaterials = materials.filter(material => {
         return material.file_name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -61,7 +61,8 @@ export function MaterialsCard({
             if (!success){
                 console.error('Failed to delete material');
             }
-            window.location.reload();
+            // window.location.reload();
+            await fetchMaterialsByClassId(selectedClass?.class_id as string, token as string);
         } catch (error) {
             console.error('Failed to delete material:', error);
         }
