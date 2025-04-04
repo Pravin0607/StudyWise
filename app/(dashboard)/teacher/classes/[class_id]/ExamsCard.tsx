@@ -68,6 +68,23 @@ export function ExamsCard({
     const [filterType, setFilterType] = useState<'all' | 'completed' | 'pending'>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
     
+    const fetchExam=async()=>{
+        try{
+            const resp=await axios.get(Endpoints.STUDENT.GETEXAMLISTBYCLASS.replace(':classId', selectedClass?.class_id!),{
+                headers:{
+                    Authorization:`Bearer ${token}`,
+                }
+            });
+            if(resp.status===200){
+                setExams(resp.data);
+            }else{
+                setExams([]);
+            }
+        }catch(e){
+            console.log(e);
+            toast.error("Error fetching exams");
+        }
+    };
     // Helper function to check if an exam is in the past
     const isExamInPast = (examDate: string, examStartTime: string): boolean => {
         const now = new Date();
@@ -104,7 +121,8 @@ export function ExamsCard({
             if(resp.status===200){
                 toast.success('Exam deleted successfully');
                 setExams(exams.filter(exam => exam.exam_id !== examId));
-                window.location.reload();
+                // window.location.reload();
+                await fetchExam();
             }
         }catch(err)
         {
@@ -139,21 +157,7 @@ export function ExamsCard({
     
     useEffect(()=>{
         (async()=>{
-            try{
-                const resp=await axios.get(Endpoints.STUDENT.GETEXAMLISTBYCLASS.replace(':classId', selectedClass?.class_id!),{
-                    headers:{
-                        Authorization:`Bearer ${token}`,
-                    }
-                });
-                if(resp.status===200){
-                    setExams(resp.data);
-                }else{
-                    setExams([]);
-                }
-            }catch(e){
-                console.log(e);
-                toast.error("Error fetching exams");
-            }
+            await fetchExam();
         })();
     },[])
 
