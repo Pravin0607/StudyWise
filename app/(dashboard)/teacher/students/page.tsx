@@ -29,6 +29,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
+import useUserStore from "@/store/userStore";
+import axios from "axios";
+import { Endpoints } from "@/lib/apiEndpoints";
 
 interface Student {
   user_id: string; // Added user_id field
@@ -37,6 +40,7 @@ interface Student {
   classes: string[];
 }
 const StudentsPage = () => {
+  const token=useUserStore(state=>state.user.token);
   const router = useRouter();
   const [students, setStudents] = useState<Student[]>([]);
   const [sorting, setSorting] = useState<any>([]);
@@ -72,7 +76,16 @@ const StudentsPage = () => {
         ]
     }
     ];
-    setStudents(mockData);
+    const data=await axios.get(Endpoints.REPORT.GETSTUDENTBYTEACHER,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    if(data.status===200){
+      setStudents(data.data?.students);
+    }else{
+      setStudents([]);
+    }
     // setStudents([]);
   };
 

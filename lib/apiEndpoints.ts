@@ -77,5 +77,9 @@ export const Endpoints={
     },
     REPORT:{
         STUDENTREPORT: `${base_url}/teacher/get-student-report/:studentId`,
+        // GET
+        TEACHERDASHBOARD: `${base_url}/teacher/get-teacher-dashboard`,  
+        // GET
+        GETSTUDENTBYTEACHER: `${base_url}/teacher/get-students-by-teacher`,
     }
 }
