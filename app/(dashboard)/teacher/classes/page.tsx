@@ -42,7 +42,7 @@ const Classes = () => {
     const [editOpen, setEditOpen] = useState(false);
     const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
     const [currentClass, setCurrentClass] = useState<any>(null);
-    
+    const [count,setCount]=useState(0);
     // Edit class function
     const updateClass = async (classId: string, newName: string) => {
         const toastId = toast.loading("Updating class...");
@@ -97,7 +97,7 @@ const Classes = () => {
                         Manage your teaching classes and courses
                     </p>
                 </div>
-                <CreateClassDialog />
+                <CreateClassDialog increase={()=>{setCount(prev=>prev+1)}} />
             </div>{" "}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full h-full">
                 {classList.map((classItem) => (
@@ -289,7 +289,7 @@ const EditClassDialog = ({ open, setOpen, currentClass, updateClass }: {
     );
 };
 
-const CreateClassDialog = () => {
+const CreateClassDialog = ({increase}:{increase:()=>void}) => {
     const {
         reset,
         handleSubmit,
@@ -303,6 +303,7 @@ const CreateClassDialog = () => {
     });
     const {user:{token}}=useUserStore();
     const [open, setOpen] = useState(false);
+    const {fetchClasses}=useClasses();
     const onSubmit: SubmitHandler<ClassForm> = async(data) => {
         // make a post request to create class
         try{
@@ -315,6 +316,7 @@ const CreateClassDialog = () => {
             toast.success("Class Created");
             reset();
             setOpen(false);
+            await fetchClasses();
         }catch(err){
             console.error(err);
             toast.error("An error occured");

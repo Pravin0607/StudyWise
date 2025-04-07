@@ -265,7 +265,7 @@ const SignIn = () => {
                   <span>Processing...</span>
                   </div>
                 ) : (
-                  <Large>Log In</Large>
+                  <Large>Sign Up</Large>
                 )}
                 </Button>
               </motion.div>
