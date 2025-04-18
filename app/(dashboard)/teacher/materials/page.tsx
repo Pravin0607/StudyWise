@@ -112,6 +112,10 @@ const MaterialsPage = () => {
             {
                 accessorKey: "uploaded_date",
                 header: "Date",
+                cell: ({ row }) => {
+                    const date = new Date(row.original.uploaded_date);
+                    return <div>{date.toLocaleDateString()}</div>; // Formats to local date string
+                },
             },
             {
                 id: "actions",
