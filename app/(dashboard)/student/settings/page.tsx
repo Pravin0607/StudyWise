@@ -34,13 +34,13 @@ const TeacherSettingsPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {email}=useUserStore(state=>state.user);
+  const {email,name}=useUserStore(state=>state.user);
   const token=useUserStore(state=>state.user.token);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      first_name: '',
-      last_name: '',
+      first_name: name.split(' ')[0] || '',
+      last_name: name.split(' ')[1] || '',
       email: email,
       mobile_no: '',
       dob: '',
