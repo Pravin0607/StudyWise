@@ -32,8 +32,13 @@ const Exams = () => {
 
     useEffect(() => {
         (async () => {
-            await fetchExamList();
-            await fetchExamResults();
+            try{
+
+                await fetchExamList();
+                await fetchExamResults();
+            }catch (error) {
+                console.error("Error fetching exam list or results:", error);
+            }
         })();
     }, []);
     const isExamAttempted = (examId: string): boolean => {
@@ -51,109 +56,121 @@ const Exams = () => {
             <div className="text-2xl font-bold text-gray-800 tracking-tight">
                 Your Exams
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-2 w-full h-full">
-                {examList.map((examsItem: TExam) => {
-                    const attempted = isExamAttempted(examsItem.exam_id);
-                    return (
-                        <Card
-                            key={examsItem.exam_id}
-                            className="p-0 h-40 max-h-48 cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden border-l-4 border-indigo-500"
-                            onClick={() => handleCardClick(examsItem)}
-                        >
-                            <CardContent className="p-3 flex h-full flex-col justify-between bg-gradient-to-br from-white to-slate-50">
-                                <div className="flex justify-between items-start">
-                                    <h2 className="font-bold text-lg text-indigo-700 pr-16">
-                                        {examsItem.title}
-                                    </h2>
-                                    <div className="flex items-center justif</svg>y-center">
-                                        {attempted ? (
-                                            <div className="flex items-center gap-2 text-sm rounded-full px-3 py-1 bg-blue-100 text-blue-700 font-semibold">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                                                    <path d="M2.695 6.351a.75.75 0 011.04-.037l4.5 6a.75.75 0 01-.99 1.125L2.695 6.351zM17.25 6.782l-4.5 6a.75.75 0 01-.99 1.125l4.5-6a.75.75 0 011.04.037zM4.75 4a.75.75 0 00-1.5 0v1.5h1.5V4zm12 0a.75.75 0 00-1.5 0v1.5h1.5V4zM10 2.5a.75.75 0 01.75.75v1.5h-1.5V3.25a.75.75 0 01.75-.75zM5.714 15.75a.75.75 0 01.969.045l3.5 4.666a.75.75 0 01-1.014 1.133l-3.5-4.667a.75.75 0 01.045-.967zM14.286 15.75a.75.75 0 00-.969.045l-3.5 4.666a.75.75 0 001.014 1.133l3.5-4.667a.75.75 0 00-.045-.967zM18.5 14.25a.75.75 0 010 1.5h-1.5v-1.5h1.5zm-12 0a.75.75 0 010 1.5h-1.5v-1.5h1.5zM10 18.5a.75.75 0 00-.75-.75h-1.5v1.5h1.5a.75.75 0 00.75-.75z" />
-                                                </svg>
-                                                Attempted
-                                            </div>
-                                        ) : examsItem.isCompleted ? (
-                                            !attempted ? (
-                                                <div className="flex items-center gap-2 text-sm rounded-full px-3 py-1 bg-yellow-100 text-yellow-700 font-semibold">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            {examList.length === 0 ? (
+                <div className="mt-4 flex flex-col items-center justify-center p-8 bg-white rounded-lg border border-dashed border-gray-300">
+                    <div className="h-24 w-24 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V19.5a2.25 2.25 0 0 0 2.25 2.25h.75m0-3H12m-.75 3h.008v.008h-.008V19.5Zm12-10.5h.008v.008h-.008V9Z" />
+                        </svg>
+                    </div>
+                    <h3 className="mt-4 text-lg font-semibold text-gray-900">No Exams Available</h3>
+                    <p className="mt-2 text-center text-gray-500">There are no exams scheduled for you at the moment. Check back later for upcoming exams.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-2 w-full h-full">
+                    {examList.map((examsItem: TExam) => {
+                        const attempted = isExamAttempted(examsItem.exam_id);
+                        return (
+                            <Card
+                                key={examsItem.exam_id}
+                                className="p-0 h-40 max-h-48 cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden border-l-4 border-indigo-500"
+                                onClick={() => handleCardClick(examsItem)}
+                            >
+                                <CardContent className="p-3 flex h-full flex-col justify-between bg-gradient-to-br from-white to-slate-50">
+                                    <div className="flex justify-between items-start">
+                                        <h2 className="font-bold text-lg text-indigo-700 pr-16">
+                                            {examsItem.title}
+                                        </h2>
+                                        <div className="flex items-center justif</svg>y-center">
+                                            {attempted ? (
+                                                <div className="flex items-center gap-2 text-sm rounded-full px-3 py-1 bg-blue-100 text-blue-700 font-semibold">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                                        <path d="M2.695 6.351a.75.75 0 011.04-.037l4.5 6a.75.75 0 01-.99 1.125L2.695 6.351zM17.25 6.782l-4.5 6a.75.75 0 01-.99 1.125l4.5-6a.75.75 0 011.04.037zM4.75 4a.75.75 0 00-1.5 0v1.5h1.5V4zm12 0a.75.75 0 00-1.5 0v1.5h1.5V4zM10 2.5a.75.75 0 01.75.75v1.5h-1.5V3.25a.75.75 0 01.75-.75zM5.714 15.75a.75.75 0 01.969.045l3.5 4.666a.75.75 0 01-1.014 1.133l-3.5-4.667a.75.75 0 01.045-.967zM14.286 15.75a.75.75 0 00-.969.045l-3.5 4.666a.75.75 0 001.014 1.133l3.5-4.667a.75.75 0 00-.045-.967zM18.5 14.25a.75.75 0 010 1.5h-1.5v-1.5h1.5zm-12 0a.75.75 0 010 1.5h-1.5v-1.5h1.5zM10 18.5a.75.75 0 00-.75-.75h-1.5v1.5h1.5a.75.75 0 00.75-.75z" />
                                                     </svg>
-                                                    Missed
+                                                    Attempted
                                                 </div>
+                                            ) : examsItem.isCompleted ? (
+                                                !attempted ? (
+                                                    <div className="flex items-center gap-2 text-sm rounded-full px-3 py-1 bg-yellow-100 text-yellow-700 font-semibold">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                        Missed
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2 text-sm rounded-full px-3 py-1 bg-green-100 text-green-700 font-semibold">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 20 20"
+                                                            fill="currentColor"
+                                                            className="w-4 h-4"
+                                                        >
+                                                            <path
+                                                                fillRule="evenodd"
+                                                                d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.97 3.97 7.473-9.819a.75.75 0 011.05-.143z"
+                                                                clipRule="evenodd"
+                                                            />
+                                                        </svg>
+                                                        Passed
+                                                    </div>
+                                                )
                                             ) : (
-                                                <div className="flex items-center gap-2 text-sm rounded-full px-3 py-1 bg-green-100 text-green-700 font-semibold">
+                                                <div className="flex items-center gap-2 text-sm rounded-full px-3 py-1 bg-red-100 text-red-700 font-semibold">
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
-                                                        viewBox="0 0 20 20"
-                                                        fill="currentColor"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        strokeWidth="1.5"
+                                                        stroke="currentColor"
                                                         className="w-4 h-4"
                                                     >
                                                         <path
-                                                            fillRule="evenodd"
-                                                            d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.97 3.97 7.473-9.819a.75.75 0 011.05-.143z"
-                                                            clipRule="evenodd"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            d="M12 6v6h4.5m-4.5 0a9 9 0 110 18 9 9 0 010-18z"
                                                         />
                                                     </svg>
-                                                    Passed
+                                                    Pending
                                                 </div>
-                                            )
-                                        ) : (
-                                            <div className="flex items-center gap-2 text-sm rounded-full px-3 py-1 bg-red-100 text-red-700 font-semibold">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    strokeWidth="1.5"
-                                                    stroke="currentColor"
-                                                    className="w-4 h-4"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        d="M12 6v6h4.5m-4.5 0a9 9 0 110 18 9 9 0 010-18z"
-                                                    />
-                                                </svg>
-                                                Pending
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="grid gap-1 gap-y-3 mt-2">
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <CalendarDays height={20}/>
-                                        <span className="text-sm">
-                                            {examsItem.date}
-                                        </span>
+                                    <div className="grid gap-1 gap-y-3 mt-2">
+                                        <div className="flex items-center gap-2 text-gray-600">
+                                            <CalendarDays height={20}/>
+                                            <span className="text-sm">
+                                                {examsItem.date}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 text-gray-600">
+                                            <Clock height={20}/>
+
+                                            <span className="text-sm">
+                                                {examsItem.start_time} -{" "}
+                                                {examsItem.end_time}
+                                            </span>
+                                        </div>
                                     </div>
 
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <Clock height={20}/>
-
-                                        <span className="text-sm">
-                                            {examsItem.start_time} -{" "}
-                                            {examsItem.end_time}
-                                        </span>
+                                    <div className="mt-auto">
+                                        <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
+                                            <span>
+                                                Total Questions:
+                                                {examsItem.total_questions || 0}
+                                            </span>
+                                            <span>
+                                                Total Marks:
+                                                {examsItem.total_marks || 0}
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div className="mt-auto">
-                                    <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-                                        <span>
-                                            Total Questions:
-                                            {examsItem.total_questions || 0}
-                                        </span>
-                                        <span>
-                                            Total Marks:
-                                            {examsItem.total_marks || 0}
-                                        </span>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    );
-                })}
-            </div>
+                                </CardContent>
+                            </Card>
+                        );
+                    })}
+                </div>
+            )}
             <Dialog open={open} onOpenChange={setOpen}>
     {selectedExam && (
         <DialogContent className="sm:max-w-[500px]">
