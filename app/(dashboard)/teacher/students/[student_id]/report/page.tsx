@@ -279,7 +279,7 @@ const StudentReport = () => {
                                                 className="h-2"
                                             />
                                             <div className="text-right text-sm">
-                                                {exam.percentage}%
+                                                {exam.percentage.toFixed(2)}%
                                             </div>
                                         </div>
                                     </CardContent>

@@ -110,207 +110,286 @@ console.log("data :",data);
   }
 
   return (
-    <div className="p-6 space-y-8">
-      <h1 className="text-3xl font-bold">Teacher Dashboard</h1>
-      
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6 flex items-center space-x-4">
-          <div className="bg-blue-100 p-3 rounded-full">
-            <GraduationCap className="text-blue-600" size={24} />
+      <div className="p-6 space-y-8">
+          <h1 className="text-3xl font-bold">Teacher Dashboard</h1>
+
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="p-6 flex items-center space-x-4">
+                  <div className="bg-blue-100 p-3 rounded-full">
+                      <GraduationCap className="text-blue-600" size={24} />
+                  </div>
+                  <div>
+                      <p className="text-sm text-muted-foreground">
+                          Total Students
+                      </p>
+                      <h2 className="text-3xl font-bold">
+                          {data?.total_students ?? "N/A"}
+                      </h2>
+                  </div>
+              </Card>
+
+              <Card className="p-6 flex items-center space-x-4">
+                  <div className="bg-green-100 p-3 rounded-full">
+                      <FileText className="text-green-600" size={24} />
+                  </div>
+                  <div>
+                      <p className="text-sm text-muted-foreground">
+                          Total Exams
+                      </p>
+                      <h2 className="text-3xl font-bold">
+                          {data?.total_exams ?? "N/A"}
+                      </h2>
+                  </div>
+              </Card>
+
+              <Card className="p-6 flex items-center space-x-4">
+                  <div className="bg-purple-100 p-3 rounded-full">
+                      <CalendarDays className="text-purple-600" size={24} />
+                  </div>
+                  <div>
+                      <p className="text-sm text-muted-foreground">
+                          Total Classes
+                      </p>
+                      <h2 className="text-3xl font-bold">
+                          {data?.total_classes ?? "N/A"}
+                      </h2>
+                  </div>
+              </Card>
           </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Total Students</p>
-            <h2 className="text-3xl font-bold">{data?.total_students ?? 'N/A'}</h2>
+
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="p-6">
+                  <h3 className="text-xl font-semibold mb-4">
+                      Exam Performance
+                  </h3>
+                  {data?.exam_scores && data.exam_scores.length > 0 ? (
+                      <div className="h-80">
+                          <ResponsiveContainer width="100%" height="100%">
+                              <BarChart
+                                  data={data?.exam_scores}
+                                  margin={{
+                                      top: 20,
+                                      right: 30,
+                                      left: 20,
+                                      bottom: 60,
+                                  }}
+                              >
+                                  <CartesianGrid strokeDasharray="3 3" />
+                                  <XAxis
+                                      dataKey="exam_title"
+                                      angle={-45}
+                                      textAnchor="end"
+                                      height={70}
+                                      tick={{ fontSize: 12 }}
+                                  />
+                                  <YAxis domain={[0, 100]} />
+                                  <Tooltip />
+                                  <Bar dataKey="average_score" fill="#8884d8" />
+                              </BarChart>
+                          </ResponsiveContainer>
+                      </div>
+                  ) : (
+                      <div className="flex flex-col items-center justify-center h-80 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                          <FileText className="h-12 w-12 text-gray-400 mb-2" />
+                          <p className="text-gray-500 font-medium">
+                              No exam data available
+                          </p>
+                          <p className="text-gray-400 text-sm text-center max-w-xs mt-1">
+                              Exam performance metrics will appear here once
+                              exams are completed
+                          </p>
+                      </div>
+                  )}
+              </Card>
+
+              <Card className="p-6">
+                  <h3 className="text-xl font-semibold mb-4">
+                      Student Performance
+                  </h3>
+                  {data?.student_scores &&
+                  data.student_scores.length > 0 &&
+                  data.student_scores.some(
+                      (student) => student.average_score > 0
+                  ) ? (
+                      <div className="h-80">
+                          <ResponsiveContainer width="100%" height="100%">
+                              <PieChart>
+                                  <Pie
+                                      data={data?.student_scores}
+                                      cx="50%"
+                                      cy="50%"
+                                      labelLine={true}
+                                      label={({ name, percent }) =>
+                                          percent > 0.05
+                                              ? `${name} (${(
+                                                    percent * 100
+                                                ).toFixed(2)}%)`
+                                              : ""
+                                      }
+                                      outerRadius={100}
+                                      fill="#8884d8"
+                                      dataKey="average_score"
+                                      nameKey="student_name"
+                                  >
+                                      {data?.student_scores.map(
+                                          (entry, index) => (
+                                              <Cell
+                                                  key={`cell-${index}`}
+                                                  fill={
+                                                      COLORS[
+                                                          index % COLORS.length
+                                                      ]
+                                                  }
+                                              />
+                                          )
+                                      )}
+                                  </Pie>
+                                  <Tooltip
+                                      formatter={(value) => [
+                                          `${
+                                              typeof value === "number"
+                                                  ? value.toFixed(2)
+                                                  : value
+                                          }%`,
+                                          "Average Score",
+                                      ]}
+                                  />
+                              </PieChart>
+                          </ResponsiveContainer>
+                      </div>
+                  ) : (
+                      <div className="flex flex-col items-center justify-center h-80 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                          <GraduationCap className="h-12 w-12 text-gray-400 mb-2" />
+                          <p className="text-gray-500 font-medium">
+                              No student data available
+                          </p>
+                          <p className="text-gray-400 text-sm text-center max-w-xs mt-1">
+                              Student performance metrics will appear here once
+                              students take exams
+                          </p>
+                      </div>
+                  )}
+              </Card>
           </div>
-        </Card>
-        
-        <Card className="p-6 flex items-center space-x-4">
-          <div className="bg-green-100 p-3 rounded-full">
-            <FileText className="text-green-600" size={24} />
+
+          {/* Tables Section - Now in a row with ScrollArea */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="p-6">
+                  <h3 className="text-xl font-semibold mb-4">
+                      Student Performance Details
+                  </h3>
+                  {data?.student_scores && data.student_scores.length > 0 ? (
+                      <ScrollArea className="h-[300px]">
+                          <Table>
+                              <TableHeader>
+                                  <TableRow>
+                                      <TableHead>Student Name</TableHead>
+                                      <TableHead className="text-right">
+                                          Average Score
+                                      </TableHead>
+                                  </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                  {data?.student_scores.map((student) => (
+                                      <TableRow key={student.student_id}>
+                                          <TableCell>
+                                              {student.student_name}
+                                          </TableCell>
+                                          <TableCell className="text-right">
+                                              <span
+                                                  className={`font-medium ${
+                                                      student.average_score >=
+                                                      70
+                                                          ? "text-green-600"
+                                                          : student.average_score >=
+                                                            40
+                                                          ? "text-amber-600"
+                                                          : "text-red-600"
+                                                  }`}
+                                              >
+                                                  {student.average_score.toFixed(
+                                                      2
+                                                  )}
+                                                  %
+                                              </span>
+                                          </TableCell>
+                                      </TableRow>
+                                  ))}
+                              </TableBody>
+                          </Table>
+                      </ScrollArea>
+                  ) : (
+                      <div className="flex flex-col items-center justify-center h-[300px] bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                          <GraduationCap className="h-12 w-12 text-gray-400 mb-2" />
+                          <p className="text-gray-500 font-medium">
+                              No student details available
+                          </p>
+                          <p className="text-gray-400 text-sm text-center max-w-xs mt-1">
+                              Detailed student performance will appear here
+                              after assessments are completed
+                          </p>
+                      </div>
+                  )}
+              </Card>
+
+              <Card className="p-6">
+                  <h3 className="text-xl font-semibold mb-4">Exam Results</h3>
+                  {data?.exam_scores && data.exam_scores.length > 0 ? (
+                      <ScrollArea className="h-[300px]">
+                          <Table>
+                              <TableHeader>
+                                  <TableRow>
+                                      <TableHead>Exam Title</TableHead>
+                                      <TableHead className="text-right">
+                                          Average Score
+                                      </TableHead>
+                                  </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                  {data?.exam_scores.map((exam) => (
+                                      <TableRow key={exam.exam_id}>
+                                          <TableCell>
+                                              {exam.exam_title}
+                                          </TableCell>
+                                          <TableCell className="text-right">
+                                              <span
+                                                  className={`font-medium ${
+                                                      exam.average_score >= 70
+                                                          ? "text-green-600"
+                                                          : exam.average_score >=
+                                                            40
+                                                          ? "text-amber-600"
+                                                          : "text-red-600"
+                                                  }`}
+                                              >
+                                                  {exam.average_score.toFixed(
+                                                      2
+                                                  )}
+                                                  %
+                                              </span>
+                                          </TableCell>
+                                      </TableRow>
+                                  ))}
+                              </TableBody>
+                          </Table>
+                      </ScrollArea>
+                  ) : (
+                      <div className="flex flex-col items-center justify-center h-[300px] bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                          <FileText className="h-12 w-12 text-gray-400 mb-2" />
+                          <p className="text-gray-500 font-medium">
+                              No exam results available
+                          </p>
+                          <p className="text-gray-400 text-sm text-center max-w-xs mt-1">
+                              Exam results will appear here once exams are
+                              graded
+                          </p>
+                      </div>
+                  )}
+              </Card>
           </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Total Exams</p>
-            <h2 className="text-3xl font-bold">{data?.total_exams ?? 'N/A'}</h2>
-          </div>
-        </Card>
-        
-        <Card className="p-6 flex items-center space-x-4">
-          <div className="bg-purple-100 p-3 rounded-full">
-            <CalendarDays className="text-purple-600" size={24} />
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Total Classes</p>
-            <h2 className="text-3xl font-bold">{data?.total_classes ?? 'N/A'}</h2>
-          </div>
-        </Card>
       </div>
-      
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <h3 className="text-xl font-semibold mb-4">Exam Performance</h3>
-          {data?.exam_scores && data.exam_scores.length > 0 ? (
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={data?.exam_scores}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="exam_title" 
-                    angle={-45} 
-                    textAnchor="end" 
-                    height={70}
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis domain={[0, 100]} />
-                  <Tooltip />
-                  <Bar dataKey="average_score" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-80 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-              <FileText className="h-12 w-12 text-gray-400 mb-2" />
-              <p className="text-gray-500 font-medium">No exam data available</p>
-              <p className="text-gray-400 text-sm text-center max-w-xs mt-1">
-                Exam performance metrics will appear here once exams are completed
-              </p>
-            </div>
-          )}
-        </Card>
-        
-        <Card className="p-6">
-  <h3 className="text-xl font-semibold mb-4">Student Performance</h3>
-  {data?.student_scores
- && data.student_scores.length > 0 && data.student_scores.some(student => student.average_score > 0)  ? (
-    <div className="h-80">
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={data?.student_scores}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-            outerRadius={100}
-            fill="#8884d8"
-            dataKey="average_score"
-            nameKey="student_name"
-          >
-            {data?.student_scores.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip formatter={(value) => [`${value}%`, 'Average Score']} />
-        </PieChart>
-      </ResponsiveContainer>
-    </div>
-  ) : (
-    <div className="flex flex-col items-center justify-center h-80 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-      <GraduationCap className="h-12 w-12 text-gray-400 mb-2" />
-      <p className="text-gray-500 font-medium">No student data available</p>
-      <p className="text-gray-400 text-sm text-center max-w-xs mt-1">
-        Student performance metrics will appear here once students take exams
-      </p>
-    </div>
-  )}
-</Card>
-      </div>
-      
-      {/* Tables Section - Now in a row with ScrollArea */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <h3 className="text-xl font-semibold mb-4">Student Performance Details</h3>
-          {data?.student_scores && data.student_scores.length > 0 ? (
-            <ScrollArea className="h-[300px]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Student Name</TableHead>
-                    <TableHead className="text-right">Average Score</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data?.student_scores.map((student) => (
-                    <TableRow key={student.student_id}>
-                      <TableCell>{student.student_name}</TableCell>
-                      <TableCell className="text-right">
-                        <span 
-                          className={`font-medium ${
-                            student.average_score >= 70 
-                              ? 'text-green-600' 
-                              : student.average_score >= 40 
-                                ? 'text-amber-600' 
-                                : 'text-red-600'
-                          }`}
-                        >
-                          {student.average_score}%
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </ScrollArea>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-[300px] bg-gray-50 rounded-lg border border-dashed border-gray-300">
-              <GraduationCap className="h-12 w-12 text-gray-400 mb-2" />
-              <p className="text-gray-500 font-medium">No student details available</p>
-              <p className="text-gray-400 text-sm text-center max-w-xs mt-1">
-                Detailed student performance will appear here after assessments are completed
-              </p>
-            </div>
-          )}
-        </Card>
-        
-        <Card className="p-6">
-          <h3 className="text-xl font-semibold mb-4">Exam Results</h3>
-          {data?.exam_scores && data.exam_scores.length > 0 ? (
-            <ScrollArea className="h-[300px]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Exam Title</TableHead>
-                    <TableHead className="text-right">Average Score</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data?.exam_scores.map((exam) => (
-                    <TableRow key={exam.exam_id}>
-                      <TableCell>{exam.exam_title}</TableCell>
-                      <TableCell className="text-right">
-                        <span 
-                          className={`font-medium ${
-                            exam.average_score >= 70 
-                              ? 'text-green-600' 
-                              : exam.average_score >= 40 
-                                ? 'text-amber-600' 
-                                : 'text-red-600'
-                          }`}
-                        >
-                          {exam.average_score}%
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </ScrollArea>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-[300px] bg-gray-50 rounded-lg border border-dashed border-gray-300">
-              <FileText className="h-12 w-12 text-gray-400 mb-2" />
-              <p className="text-gray-500 font-medium">No exam results available</p>
-              <p className="text-gray-400 text-sm text-center max-w-xs mt-1">
-                Exam results will appear here once exams are graded
-              </p>
-            </div>
-          )}
-        </Card>
-      </div>
-    </div>
   );
 };
 
